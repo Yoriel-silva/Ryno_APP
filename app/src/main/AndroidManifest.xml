@@ -24,6 +24,10 @@
 
         <activity android:name=".TipoCadastroActivity" />
 
+        <activity android:name=".CadastroAlunoActivity" />
+
+        <activity android:name=".CadastroProfessorActivity" />
+
         <activity android:name=".HomeAlunoActivity" />
 
         <activity android:name=".HomeProfessorActivity" />

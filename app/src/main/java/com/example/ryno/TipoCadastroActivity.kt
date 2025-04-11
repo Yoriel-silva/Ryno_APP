@@ -19,7 +19,8 @@ class TipoCadastroActivity : AppCompatActivity() {
         }
 
         btnAluno.setOnClickListener {
-            startActivity(Intent(this, CadastroAlunoActivity::class.java))
+            val intent = Intent(this, CadastroAlunoActivity::class.java)
+            startActivity(intent)
         }
     }
 }
