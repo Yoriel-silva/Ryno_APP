@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#000000">
+
+    <!-- LOGO -->
+    <ImageView
+        android:id="@+id/imageViewLogo"
+        android:layout_width="88dp"
+        android:layout_height="88dp"
+        android:layout_marginTop="50dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:srcCompat="@drawable/logo_ryno" />
+
+    <!-- NOME -->
+    <EditText
+        android:id="@+id/NomeProfessor"
+        android:layout_width="0dp"
+        android:layout_height="45dp"
+        android:layout_marginTop="80dp"
+        android:layout_marginHorizontal="32dp"
+        android:hint="Nome"
+        android:background="@drawable/edittext_background"
+        android:fontFamily="@font/concert_one"
+        android:textColor="#8900DD"
+        android:textColorHint="#8900DD"
+        android:inputType="textPersonName"
+        android:padding="12dp"
+        app:layout_constraintTop_toBottomOf="@id/imageViewLogo"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <!-- EMAIL -->
+    <EditText
+        android:id="@+id/EmailProfessor"
+        android:layout_width="0dp"
+        android:layout_height="45dp"
+        android:layout_marginTop="12dp"
+        android:layout_marginHorizontal="32dp"
+        android:hint="Email"
+        android:background="@drawable/edittext_background"
+        android:fontFamily="@font/concert_one"
+        android:textColor="#8900DD"
+        android:textColorHint="#8900DD"
+        android:inputType="textEmailAddress"
+        android:padding="12dp"
+        app:layout_constraintTop_toBottomOf="@id/NomeProfessor"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <!-- TELEFONE -->
+    <EditText
+        android:id="@+id/TelefoneProfessor"
+        android:layout_width="0dp"
+        android:layout_height="45dp"
+        android:layout_marginTop="12dp"
+        android:layout_marginHorizontal="32dp"
+        android:hint="Telefone"
+        android:background="@drawable/edittext_background"
+        android:fontFamily="@font/concert_one"
+        android:textColor="#8900DD"
+        android:textColorHint="#8900DD"
+        android:inputType="phone"
+        android:padding="12dp"
+        app:layout_constraintTop_toBottomOf="@id/EmailProfessor"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <!-- SENHA -->
+    <EditText
+        android:id="@+id/SenhaProfessor"
+        android:layout_width="0dp"
+        android:layout_height="45dp"
+        android:layout_marginTop="12dp"
+        android:layout_marginHorizontal="32dp"
+        android:hint="Senha"
+        android:background="@drawable/edittext_background"
+        android:fontFamily="@font/concert_one"
+        android:textColor="#8900DD"
+        android:textColorHint="#8900DD"
+        android:inputType="textPassword"
+        android:padding="12dp"
+        app:layout_constraintTop_toBottomOf="@id/TelefoneProfessor"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <!-- CREF -->
+    <EditText
+        android:id="@+id/CREF"
+        android:layout_width="0dp"
+        android:layout_height="45dp"
+        android:layout_marginTop="12dp"
+        android:layout_marginHorizontal="32dp"
+        android:hint="CREF"
+        android:background="@drawable/edittext_background"
+        android:fontFamily="@font/concert_one"
+        android:textColor="#8900DD"
+        android:textColorHint="#8900DD"
+        android:inputType="text"
+        android:padding="12dp"
+        app:layout_constraintTop_toBottomOf="@id/SenhaProfessor"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <!-- CHECKBOX -->
+    <CheckBox
+        android:id="@+id/checkBoxConcordo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginStart="32dp"
+        android:text="Li e concordo com os"
+        android:fontFamily="@font/concert_one"
+        android:textColor="#FFFFFF"
+        android:buttonTint="#673AB7"
+        app:layout_constraintTop_toBottomOf="@id/CREF"
+        app:layout_constraintStart_toStartOf="parent"/>
+
+    <!-- TERMOS LINK -->
+    <TextView
+        android:id="@+id/termosLink"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="@string/termos"
+        android:textColor="#8900DD"
+        android:fontFamily="@font/concert_one"
+        app:layout_constraintTop_toBottomOf="@id/CREF"
+        app:layout_constraintStart_toEndOf="@id/checkBoxConcordo"/>
+
+    <!-- BOTÃO CRIAR -->
+    <Button
+        android:id="@+id/Btn_CriarProfessor"
+        android:layout_width="130dp"
+        android:layout_height="41dp"
+        android:layout_marginTop="36dp"
+        android:background="@drawable/rounded_button"
+        android:text="Criar"
+        android:textColor="@color/white"
+        android:textSize="16sp"
+        android:fontFamily="@font/concert_one"
+        app:layout_constraintTop_toBottomOf="@id/checkBoxConcordo"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+</androidx.constraintlayout.widget.ConstraintLayout>
