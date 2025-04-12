@@ -3,8 +3,14 @@ package com.example.ryno
 import android.os.Bundle
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
+import java.text.Normalizer
 
 class CadastroProfessorActivity : AppCompatActivity() {
+
+    private val cidades = listOf(
+        "São Paulo", "Salvador", "Fortaleza", "Belo Horizonte",
+        "Rio de Janeiro", "Curitiba", "Brasília", "Manaus", "Recife", "Porto Alegre"
+    )
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -23,6 +29,10 @@ class CadastroProfessorActivity : AppCompatActivity() {
         val modalidades = arrayOf("Futebol", "Basquete", "Vôlei", "Natação")
         val modalidadesSelecionadas = BooleanArray(modalidades.size)
         val modalidadesEscolhidas = mutableListOf<String>()
+
+        val autoCidade = findViewById<AutoCompleteTextView>(R.id.autoCidade)
+        val adapter = CidadeAdapter(this, cidades)
+        autoCidade.setAdapter(adapter)
 
         tvModalidades.setOnClickListener {
             val builder = android.app.AlertDialog.Builder(this)
@@ -71,4 +81,41 @@ class CadastroProfessorActivity : AppCompatActivity() {
             ).show()
         }
     }
+
+    class CidadeAdapter(context: android.content.Context, private val cidades: List<String>) :
+        ArrayAdapter<String>(context, android.R.layout.simple_dropdown_item_1line, cidades), Filterable {
+
+        private var resultados: List<String> = listOf()
+
+        private fun normalizar(texto: String): String {
+            return Normalizer.normalize(texto.lowercase(), Normalizer.Form.NFD)
+                .replace("[\\p{InCombiningDiacriticalMarks}]".toRegex(), "")
+        }
+
+        override fun getCount(): Int = resultados.size
+
+        override fun getItem(position: Int): String = resultados[position]
+
+        override fun getFilter(): Filter {
+            return object : Filter() {
+                override fun performFiltering(constraint: CharSequence?): FilterResults {
+                    val filtro = FilterResults()
+                    if (constraint != null) {
+                        val entrada = normalizar(constraint.toString())
+                        resultados = cidades.filter {
+                            normalizar(it).contains(entrada)
+                        }.take(5)
+                        filtro.values = resultados
+                        filtro.count = resultados.size
+                    }
+                    return filtro
+                }
+
+                override fun publishResults(constraint: CharSequence?, results: FilterResults?) {
+                    notifyDataSetChanged()
+                }
+            }
+        }
+    }
+
 }
