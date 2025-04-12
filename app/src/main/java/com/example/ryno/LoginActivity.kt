@@ -24,7 +24,7 @@ class LoginActivity : AppCompatActivity() {
         if (isLoggedIn) {
             when (userType) {
                 "aluno" -> {
-                    startActivity(Intent(this, HomeAlunoActivity::class.java))
+                    startActivity(Intent(this, ModalidadeAlunoActivity::class.java))
                 }
                 "professor" -> {
                     startActivity(Intent(this, HomeProfessorActivity::class.java))
@@ -45,7 +45,7 @@ class LoginActivity : AppCompatActivity() {
 
         buttonLogin.setOnClickListener {
             // 2. Cria o Intent para abrir a tela HomeAlunoActivity
-            val intent = Intent(this, HomeAlunoActivity::class.java)
+            val intent = Intent(this, ModalidadeAlunoActivity::class.java)
             startActivity(intent)
             finish() // Opcional: finaliza a LoginActivity para não voltar com o botão de voltar
         }

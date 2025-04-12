@@ -43,7 +43,7 @@ class CadastroAlunoActivity : AppCompatActivity() {
             Toast.makeText(this, "Conta criada com sucesso!", Toast.LENGTH_SHORT).show()
 
             // Redirecionar para a home do aluno (vamos criar essa activity depois)
-            val intent = Intent(this, HomeAlunoActivity::class.java)
+            val intent = Intent(this, ModalidadeAlunoActivity::class.java)
             startActivity(intent)
             finish()
         }

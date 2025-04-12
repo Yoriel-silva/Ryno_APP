@@ -29,11 +29,13 @@
         <activity android:name=".CadastroProfessorActivity"
             android:windowSoftInputMode="adjustResize"/>
 
-        <activity android:name=".HomeAlunoActivity" />
+        <activity android:name=".ModalidadeAlunoActivity" />
 
-        <activity android:name=".HomeProfessorActivity" />
+        <activity android:name=".ProfessoresAlunoActivity" />
 
-        <activity android:name=".TesteActivity" />
+        <activity android:name=".PerfilAlunoActivity" />
+
+        <activity android:name=".PerfilProfessorActivity" />
 
         <activity
             android:name=".MainActivity"
