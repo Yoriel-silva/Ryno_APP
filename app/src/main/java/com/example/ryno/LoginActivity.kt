@@ -8,6 +8,7 @@ import android.text.Spanned
 import android.text.method.LinkMovementMethod
 import android.text.style.ClickableSpan
 import android.view.View
+import android.widget.Button
 import android.widget.TextView
 import android.graphics.Color
 
@@ -38,6 +39,17 @@ class LoginActivity : AppCompatActivity() {
         } else {
             setContentView(R.layout.activity_login)
         }
+
+        // Codigo botão login
+        val buttonLogin = findViewById<Button>(R.id.buttonLogin) // 1. Referencia o botão pelo ID
+
+        buttonLogin.setOnClickListener {
+            // 2. Cria o Intent para abrir a tela HomeAlunoActivity
+            val intent = Intent(this, HomeAlunoActivity::class.java)
+            startActivity(intent)
+            finish() // Opcional: finaliza a LoginActivity para não voltar com o botão de voltar
+        }
+
 
         // Texto "Criar Conta" parcialmente clicável
         val tvCriarConta = findViewById<TextView>(R.id.tvCriarConta)

@@ -1,14 +1,11 @@
 package com.example.ryno
 
-
 import android.os.Bundle
-import android.widget.Button
-import android.widget.CheckBox
-import android.widget.EditText
-import android.widget.Toast
+import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 
 class CadastroProfessorActivity : AppCompatActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_cadastro_professor)
@@ -18,8 +15,41 @@ class CadastroProfessorActivity : AppCompatActivity() {
         val telefone = findViewById<EditText>(R.id.TelefoneProfessor)
         val senha = findViewById<EditText>(R.id.SenhaProfessor)
         val cref = findViewById<EditText>(R.id.CREF)
-        val checkbox = findViewById<CheckBox>(R.id.checkBoxConcordo)
+        val checkbox = findViewById<CheckBox>(R.id.checkBox)
         val botaoCriar = findViewById<Button>(R.id.Btn_CriarProfessor)
+
+        // Modalidades - múltipla escolha
+        val tvModalidades = findViewById<TextView>(R.id.modalidadeSelecionada)
+        val modalidades = arrayOf("Futebol", "Basquete", "Vôlei", "Natação")
+        val modalidadesSelecionadas = BooleanArray(modalidades.size)
+        val modalidadesEscolhidas = mutableListOf<String>()
+
+        tvModalidades.setOnClickListener {
+            val builder = android.app.AlertDialog.Builder(this)
+            builder.setTitle("Selecione as modalidades")
+
+            builder.setMultiChoiceItems(modalidades, modalidadesSelecionadas) { _, which, isChecked ->
+                modalidadesSelecionadas[which] = isChecked
+            }
+
+            builder.setPositiveButton("OK") { _, _ ->
+                modalidadesEscolhidas.clear()
+                for (i in modalidades.indices) {
+                    if (modalidadesSelecionadas[i]) {
+                        modalidadesEscolhidas.add(modalidades[i])
+                    }
+                }
+
+                if (modalidadesEscolhidas.isNotEmpty()) {
+                    tvModalidades.text = modalidadesEscolhidas.joinToString(", ")
+                } else {
+                    tvModalidades.text = "Escolha uma modalidade"
+                }
+            }
+
+            builder.setNegativeButton("Cancelar", null)
+            builder.show()
+        }
 
         botaoCriar.setOnClickListener {
             if (!checkbox.isChecked) {
@@ -33,8 +63,12 @@ class CadastroProfessorActivity : AppCompatActivity() {
             val senhaTxt = senha.text.toString()
             val crefTxt = cref.text.toString()
 
-            // Aqui você poderá futuramente salvar os dados no Firebase ou outro banco
-            Toast.makeText(this, "Professor $nomeTxt cadastrado com sucesso!", Toast.LENGTH_LONG).show()
+            // Exemplo: salvar essas informações futuramente no banco
+            Toast.makeText(
+                this,
+                "Professor $nomeTxt cadastrado com sucesso!\nModalidades: ${modalidadesEscolhidas.joinToString()}",
+                Toast.LENGTH_LONG
+            ).show()
         }
     }
 }
