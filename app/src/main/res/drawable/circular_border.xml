@@ -1,0 +1,6 @@
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <corners android:radius="50dp"/> <!-- Tornando a borda arredondada -->
+    <stroke
+        android:color="#8900DD"
+        android:width="4dp"/> <!-- Largura da borda -->
+</shape>
