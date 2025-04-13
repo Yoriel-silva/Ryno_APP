@@ -2,19 +2,23 @@ package com.example.ryno
 
 import android.content.Intent
 import android.os.Bundle
-import android.widget.Button
-import android.widget.CheckBox
-import android.widget.EditText
-import android.widget.Toast
+import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 
 class CadastroAlunoActivity : AppCompatActivity() {
+
+    private lateinit var auth: FirebaseAuth
+    private lateinit var db: FirebaseFirestore
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_cadastro_aluno)
 
-        // Referência aos elementos da interface
+        auth = FirebaseAuth.getInstance()
+        db = FirebaseFirestore.getInstance()
+
         val nomeEditText = findViewById<EditText>(R.id.NomeAluno)
         val emailEditText = findViewById<EditText>(R.id.EmailAluno)
         val telefoneEditText = findViewById<EditText>(R.id.TelefoneAluno)
@@ -28,7 +32,6 @@ class CadastroAlunoActivity : AppCompatActivity() {
             val telefone = telefoneEditText.text.toString().trim()
             val senha = senhaEditText.text.toString().trim()
 
-            // Verificações básicas
             if (nome.isEmpty() || email.isEmpty() || telefone.isEmpty() || senha.isEmpty()) {
                 Toast.makeText(this, "Preencha todos os campos", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
@@ -39,13 +42,32 @@ class CadastroAlunoActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-            // Aqui você pode salvar os dados no Firebase, banco local, etc.
-            Toast.makeText(this, "Conta criada com sucesso!", Toast.LENGTH_SHORT).show()
+            auth.createUserWithEmailAndPassword(email, senha)
+                .addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        val userId = auth.currentUser?.uid ?: ""
+                        val alunoData = hashMapOf(
+                            "uid" to userId,
+                            "nome" to nome,
+                            "email" to email,
+                            "telefone" to telefone,
+                            "tipo" to "aluno"
+                        )
 
-            // Redirecionar para a home do aluno (vamos criar essa activity depois)
-            val intent = Intent(this, ModalidadeAlunoActivity::class.java)
-            startActivity(intent)
-            finish()
+                        db.collection("usuarios").document(userId)
+                            .set(alunoData)
+                            .addOnSuccessListener {
+                                Toast.makeText(this, "Conta criada com sucesso!", Toast.LENGTH_SHORT).show()
+                                startActivity(Intent(this, ModalidadeAlunoActivity::class.java))
+                                finish()
+                            }
+                            .addOnFailureListener {
+                                Toast.makeText(this, "Erro ao salvar dados: ${it.message}", Toast.LENGTH_SHORT).show()
+                            }
+                    } else {
+                        Toast.makeText(this, "Erro ao criar usuário: ${task.exception?.message}", Toast.LENGTH_SHORT).show()
+                    }
+                }
         }
     }
 }

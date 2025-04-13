@@ -1,12 +1,18 @@
 package com.example.ryno
 
+import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 import java.text.Normalizer
 
 class CadastroProfessorActivity : AppCompatActivity() {
 
+    private lateinit var auth: FirebaseAuth
+    private lateinit var db: FirebaseFirestore
     private val cidades = listOf(
         "São Paulo", "Salvador", "Fortaleza", "Belo Horizonte",
         "Rio de Janeiro", "Curitiba", "Brasília", "Manaus", "Recife", "Porto Alegre"
@@ -16,6 +22,9 @@ class CadastroProfessorActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_cadastro_professor)
 
+        auth = FirebaseAuth.getInstance()
+        db = FirebaseFirestore.getInstance()
+
         val nome = findViewById<EditText>(R.id.NomeProfessor)
         val email = findViewById<EditText>(R.id.EmailProfessor)
         val telefone = findViewById<EditText>(R.id.TelefoneProfessor)
@@ -24,7 +33,6 @@ class CadastroProfessorActivity : AppCompatActivity() {
         val checkbox = findViewById<CheckBox>(R.id.checkBox)
         val botaoCriar = findViewById<Button>(R.id.Btn_CriarProfessor)
 
-        // Modalidades - múltipla escolha
         val tvModalidades = findViewById<TextView>(R.id.modalidadeSelecionada)
         val modalidades = arrayOf("Futebol", "Basquete", "Vôlei", "Natação")
         val modalidadesSelecionadas = BooleanArray(modalidades.size)
@@ -37,11 +45,9 @@ class CadastroProfessorActivity : AppCompatActivity() {
         tvModalidades.setOnClickListener {
             val builder = android.app.AlertDialog.Builder(this)
             builder.setTitle("Selecione as modalidades")
-
             builder.setMultiChoiceItems(modalidades, modalidadesSelecionadas) { _, which, isChecked ->
                 modalidadesSelecionadas[which] = isChecked
             }
-
             builder.setPositiveButton("OK") { _, _ ->
                 modalidadesEscolhidas.clear()
                 for (i in modalidades.indices) {
@@ -49,36 +55,63 @@ class CadastroProfessorActivity : AppCompatActivity() {
                         modalidadesEscolhidas.add(modalidades[i])
                     }
                 }
-
-                if (modalidadesEscolhidas.isNotEmpty()) {
-                    tvModalidades.text = modalidadesEscolhidas.joinToString(", ")
-                } else {
-                    tvModalidades.text = "Escolha uma modalidade"
-                }
+                tvModalidades.text = if (modalidadesEscolhidas.isNotEmpty())
+                    modalidadesEscolhidas.joinToString(", ")
+                else
+                    "Escolha uma modalidade"
             }
-
             builder.setNegativeButton("Cancelar", null)
             builder.show()
         }
 
         botaoCriar.setOnClickListener {
+            val nomeTxt = nome.text.toString().trim()
+            val emailTxt = email.text.toString().trim()
+            val telefoneTxt = telefone.text.toString().trim()
+            val senhaTxt = senha.text.toString().trim()
+            val crefTxt = cref.text.toString().trim()
+            val cidade = autoCidade.text.toString().trim()
+
+            if (nomeTxt.isEmpty() || emailTxt.isEmpty() || telefoneTxt.isEmpty() || senhaTxt.isEmpty() || crefTxt.isEmpty()) {
+                Toast.makeText(this, "Preencha todos os campos", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
             if (!checkbox.isChecked) {
                 Toast.makeText(this, "Você deve aceitar os termos.", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
-            val nomeTxt = nome.text.toString()
-            val emailTxt = email.text.toString()
-            val telefoneTxt = telefone.text.toString()
-            val senhaTxt = senha.text.toString()
-            val crefTxt = cref.text.toString()
+            auth.createUserWithEmailAndPassword(emailTxt, senhaTxt)
+                .addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        val userId = auth.currentUser?.uid ?: ""
+                        val professorData = hashMapOf(
+                            "uid" to userId,
+                            "nome" to nomeTxt,
+                            "email" to emailTxt,
+                            "telefone" to telefoneTxt,
+                            "cref" to crefTxt,
+                            "cidade" to cidade,
+                            "modalidades" to modalidadesEscolhidas,
+                            "tipo" to "professor"
+                        )
 
-            // Exemplo: salvar essas informações futuramente no banco
-            Toast.makeText(
-                this,
-                "Professor $nomeTxt cadastrado com sucesso!\nModalidades: ${modalidadesEscolhidas.joinToString()}",
-                Toast.LENGTH_LONG
-            ).show()
+                        db.collection("usuarios").document(userId)
+                            .set(professorData)
+                            .addOnSuccessListener {
+                                Toast.makeText(this, "Conta criada com sucesso!", Toast.LENGTH_SHORT).show()
+                                startActivity(Intent(this, LoginActivity::class.java)) // adicione aqui o destino
+                                finish()
+                            }
+                            .addOnFailureListener {
+                                Toast.makeText(this, "Erro ao salvar dados: ${it.message}", Toast.LENGTH_SHORT).show()
+                            }
+                    } else {
+                        Toast.makeText(this, "Erro ao criar usuário: ${task.exception?.message}", Toast.LENGTH_SHORT).show()
+                        Log.e("Auth", "Erro ao criar usuário", task.exception)
+                    }
+                }
         }
     }
 
@@ -93,7 +126,6 @@ class CadastroProfessorActivity : AppCompatActivity() {
         }
 
         override fun getCount(): Int = resultados.size
-
         override fun getItem(position: Int): String = resultados[position]
 
         override fun getFilter(): Filter {
@@ -117,5 +149,4 @@ class CadastroProfessorActivity : AppCompatActivity() {
             }
         }
     }
-
 }

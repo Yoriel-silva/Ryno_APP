@@ -15,11 +15,14 @@ class TipoCadastroActivity : AppCompatActivity() {
         val btnAluno = findViewById<Button>(R.id.btnAluno)
 
         btnProfessor.setOnClickListener {
-            startActivity(Intent(this, CadastroProfessorActivity::class.java))
+            val intent = Intent(this, CadastroProfessorActivity::class.java)
+            intent.putExtra("tipoUsuario", "professor")
+            startActivity(intent)
         }
 
         btnAluno.setOnClickListener {
             val intent = Intent(this, CadastroAlunoActivity::class.java)
+            intent.putExtra("tipoUsuario", "aluno")
             startActivity(intent)
         }
     }

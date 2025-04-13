@@ -37,6 +37,8 @@
 
         <activity android:name=".PerfilProfessorActivity" />
 
+        <activity android:name=".TesteActivity" />
+
         <activity
             android:name=".MainActivity"
             android:exported="true">
