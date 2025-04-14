@@ -5,6 +5,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.auth.FirebaseAuth
@@ -24,6 +25,12 @@ class PerfilProfessorActivity : AppCompatActivity() {
     private lateinit var edtEmail: EditText
     private lateinit var edtTelefone: EditText
     private lateinit var edtCref: EditText
+
+    private lateinit var edtModalidades: TextView
+
+    private val modalidades = arrayOf("Futebol", "Basquete", "Vôlei", "Natação")
+    private val modalidadesSelecionadas = BooleanArray(modalidades.size)
+    private val modalidadesEscolhidas = mutableListOf<String>()
 
     private lateinit var edtCidade: AutoCompleteTextView
 
@@ -51,39 +58,17 @@ class PerfilProfessorActivity : AppCompatActivity() {
         edtTelefone = findViewById(R.id.edtTelefone)
         edtCref = findViewById(R.id.edtCref)
 
+        edtModalidades = findViewById(R.id.edtModalidade)
+
+        edtModalidades.setOnClickListener {
+            abrirDialogModalidades()
+        }
+
         edtCidade = findViewById(R.id.edtCidade)
         val adapter = CidadeAdapter(this, cidades)
         edtCidade.setAdapter(adapter)
 
-        val userId = firebaseAuth.currentUser?.uid
-        if (userId != null) {
-            val firestoreRef = FirebaseFirestore.getInstance().collection("usuarios").document(userId)
-
-            firestoreRef.get().addOnSuccessListener { documentSnapshot ->
-                if (documentSnapshot.exists()) {
-                    val nome = documentSnapshot.getString("nome")
-                    val email = documentSnapshot.getString("email")
-                    val telefone = documentSnapshot.getString("telefone")
-                    val cref = documentSnapshot.getString("cref")
-
-                    val cidade = documentSnapshot.getString("cidade")
-                    val profileImageUrl = documentSnapshot.getString("profileImageUrl")
-
-                    edtNome.setText(nome ?: "")
-                    edtEmail.setText(email ?: "")
-                    edtTelefone.setText(telefone ?: "")
-                    edtCref.setText(cref ?: "")
-                    edtCidade.setText(cidade ?: "")
-                    if (!profileImageUrl.isNullOrEmpty()) {
-                        Picasso.get().load(profileImageUrl).into(imgPerfil)
-                    }
-                } else {
-                    Toast.makeText(this, "Usuário não encontrado", Toast.LENGTH_SHORT).show()
-                }
-            }.addOnFailureListener {
-                Toast.makeText(this, "Erro ao carregar dados do perfil", Toast.LENGTH_SHORT).show()
-            }
-        }
+        carregarDadosDoProfessor()
 
         imgPerfil.setOnClickListener {
             if (checkSelfPermission(android.Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
@@ -94,30 +79,52 @@ class PerfilProfessorActivity : AppCompatActivity() {
         }
 
         btnSalvar.setOnClickListener {
+            // Coleta os dados dos campos EditText
             val nome = edtNome.text.toString()
             val email = edtEmail.text.toString()
             val telefone = edtTelefone.text.toString()
             val cref = edtCref.text.toString()
             val cidade = edtCidade.text.toString()
 
+            // Coleta as modalidades selecionadas
+            val modalidadesEscolhidas = mutableListOf<String>()
+            for (i in modalidades.indices) {
+                if (modalidadesSelecionadas[i]) {
+                    modalidadesEscolhidas.add(modalidades[i])
+                }
+            }
+
+            // Adicionando log para depurar as modalidades
+            Log.d("Modalidades", "Modalidades Selecionadas: ${modalidadesSelecionadas.joinToString(", ")}")
+            Log.d("Modalidades", "Modalidades Escolhidas: $modalidadesEscolhidas")
+
+            // Cria o mapa com os dados para salvar no Firestore
             val userMap = mapOf(
                 "nome" to nome,
                 "email" to email,
                 "telefone" to telefone,
                 "cref" to cref,
-                "cidade" to cidade
+                "cidade" to cidade,
+                "modalidades" to modalidadesEscolhidas  // Salva as modalidades escolhidas
             )
 
-            val userId = firebaseAuth.currentUser?.uid
-            val firestoreRef = FirebaseFirestore.getInstance().collection("usuarios").document(userId ?: "")
+            // Verifica se as modalidades estão sendo salvas corretamente
+            if (modalidadesEscolhidas.isEmpty()) {
+                Toast.makeText(this, "Por favor, selecione ao menos uma modalidade", Toast.LENGTH_SHORT).show()
+            } else {
+                // Pega o ID do usuário atual
+                val userId = firebaseAuth.currentUser?.uid
+                val firestoreRef = FirebaseFirestore.getInstance().collection("usuarios").document(userId ?: "")
 
-            firestoreRef.update(userMap)
-                .addOnSuccessListener {
-                    Toast.makeText(this, "Dados salvos com sucesso!", Toast.LENGTH_SHORT).show()
-                }
-                .addOnFailureListener {
-                    Toast.makeText(this, "Erro ao salvar dados", Toast.LENGTH_SHORT).show()
-                }
+                // Atualiza os dados do usuário no Firestore
+                firestoreRef.update(userMap)
+                    .addOnSuccessListener {
+                        Toast.makeText(this, "Dados salvos com sucesso!", Toast.LENGTH_SHORT).show()
+                    }
+                    .addOnFailureListener {
+                        Toast.makeText(this, "Erro ao salvar dados", Toast.LENGTH_SHORT).show()
+                    }
+            }
         }
 
         btnDeslogar.setOnClickListener {
@@ -125,6 +132,40 @@ class PerfilProfessorActivity : AppCompatActivity() {
             startActivity(Intent(this, LoginActivity::class.java))
             finish()
         }
+    }
+
+    private fun abrirDialogModalidades() {
+        val builder = android.app.AlertDialog.Builder(this)
+        builder.setTitle("Editar modalidades")
+
+        // Passando o estado de modalidadesSelecionadas corretamente para o AlertDialog
+        builder.setMultiChoiceItems(modalidades, modalidadesSelecionadas) { _, which, isChecked ->
+            // Atualizando o estado da modalidade selecionada
+            modalidadesSelecionadas[which] = isChecked
+        }
+
+        builder.setPositiveButton("OK") { _, _ ->
+            // Após o clique em OK, atualiza as modalidades escolhidas
+            modalidadesEscolhidas.clear()
+            for (i in modalidades.indices) {
+                if (modalidadesSelecionadas[i]) {
+                    modalidadesEscolhidas.add(modalidades[i])
+                }
+            }
+
+            // Log para verificar as modalidades escolhidas
+            Log.d("Modalidades", "Modalidades Escolhidas após OK: ${modalidadesEscolhidas.joinToString(", ")}")
+
+            // Atualiza o TextView com as modalidades escolhidas
+            edtModalidades.text = if (modalidadesEscolhidas.isNotEmpty()) {
+                modalidadesEscolhidas.joinToString(", ")
+            } else {
+                "Escolha uma modalidade"
+            }
+        }
+
+        builder.setNegativeButton("Cancelar", null)
+        builder.show()
     }
 
     class CidadeAdapter(context: android.content.Context, private val cidades: List<String>) :
@@ -215,4 +256,65 @@ class PerfilProfessorActivity : AppCompatActivity() {
                 Toast.makeText(this, "Erro ao salvar imagem de perfil", Toast.LENGTH_SHORT).show()
             }
     }
+
+    private fun carregarDadosDoProfessor() {
+        val userId = firebaseAuth.currentUser?.uid
+        if (userId != null) {
+            val firestoreRef = FirebaseFirestore.getInstance().collection("usuarios").document(userId)
+
+            firestoreRef.get().addOnSuccessListener { documentSnapshot ->
+                if (documentSnapshot.exists()) {
+                    val nome = documentSnapshot.getString("nome")
+                    val email = documentSnapshot.getString("email")
+                    val telefone = documentSnapshot.getString("telefone")
+                    val cref = documentSnapshot.getString("cref")
+                    val cidade = documentSnapshot.getString("cidade")
+                    val profileImageUrl = documentSnapshot.getString("profileImageUrl")
+
+                    // Tentando pegar as modalidades e adicionar um log para depuração
+                    val modalidades = documentSnapshot.get("modalidades") as? List<*>
+                    Log.d("Modalidades", "Modalidades do usuário: $modalidades")
+
+                    edtNome.setText(nome ?: "")
+                    edtEmail.setText(email ?: "")
+                    edtTelefone.setText(telefone ?: "")
+                    edtCref.setText(cref ?: "")
+                    edtCidade.setText(cidade ?: "")
+
+                    if (!profileImageUrl.isNullOrEmpty()) {
+                        Picasso.get().load(profileImageUrl).into(imgPerfil)
+                    }
+
+                    // Aqui, você precisa garantir que as modalidades sejam corretamente atribuídas
+                    if (!modalidades.isNullOrEmpty()) {
+                        // Converte a lista de modalidades para string para exibição
+                        val modalidadesStr = modalidades.filterIsInstance<String>().joinToString(", ")
+                        edtModalidades.setText(modalidadesStr)
+
+                        // Preenche a variável global `modalidadesSelecionadas` corretamente
+                        val modalidadesArray = arrayOf("Futebol", "Basquete", "Vôlei", "Natação")
+
+                        // Atualizando diretamente a variável global `modalidadesSelecionadas`
+                        for (i in modalidadesArray.indices) {
+                            if (modalidades.contains(modalidadesArray[i])) {
+                                modalidadesSelecionadas[i] = true
+                            } else {
+                                modalidadesSelecionadas[i] = false
+                            }
+                        }
+
+                        // Ao clicar no TextView, abre o AlertDialog
+                        edtModalidades.setOnClickListener {
+                            abrirDialogModalidades()
+                        }
+                    }
+                } else {
+                    Toast.makeText(this, "Usuário não encontrado", Toast.LENGTH_SHORT).show()
+                }
+            }.addOnFailureListener {
+                Toast.makeText(this, "Erro ao carregar dados do perfil", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
 }
