@@ -8,12 +8,14 @@ import android.os.Bundle
 import android.util.Log
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
+import com.cloudinary.android.MediaManager
+import com.cloudinary.android.callback.ErrorInfo
+import com.cloudinary.android.callback.UploadCallback
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.storage.FirebaseStorage
-import com.google.firebase.storage.StorageReference
 import com.google.firebase.firestore.FirebaseFirestore
 import com.squareup.picasso.Picasso
 import java.text.Normalizer
+import jp.wasabeef.picasso.transformations.CropCircleTransformation
 
 class PerfilProfessorActivity : AppCompatActivity() {
 
@@ -40,14 +42,14 @@ class PerfilProfessorActivity : AppCompatActivity() {
     )
 
     private lateinit var firebaseAuth: FirebaseAuth
-    private lateinit var storageReference: StorageReference
+
+    private lateinit var cloudinary: MediaManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_perfil_professor)
 
         firebaseAuth = FirebaseAuth.getInstance()
-        storageReference = FirebaseStorage.getInstance().reference
 
         imgPerfil = findViewById(R.id.imgPerfil)
         btnSalvar = findViewById(R.id.btnSalvar)
@@ -71,12 +73,12 @@ class PerfilProfessorActivity : AppCompatActivity() {
         carregarDadosDoProfessor()
 
         imgPerfil.setOnClickListener {
-            if (checkSelfPermission(android.Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
-                openGallery()
-            } else {
-                requestPermissions(arrayOf(android.Manifest.permission.READ_EXTERNAL_STORAGE), 101)
-            }
+            val intent = Intent(Intent.ACTION_PICK)
+            intent.type = "image/*"
+            startActivityForResult(intent, 100)
         }
+
+        cloudinary = com.cloudinary.android.MediaManager.get()
 
         btnSalvar.setOnClickListener {
             // Coleta os dados dos campos EditText
@@ -222,39 +224,67 @@ class PerfilProfessorActivity : AppCompatActivity() {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == 100 && resultCode == Activity.RESULT_OK) {
             val imageUri: Uri? = data?.data
-            Picasso.get().load(imageUri).into(imgPerfil)
-
             imageUri?.let { uri ->
-                val userId = firebaseAuth.currentUser?.uid ?: return@let
-                val imageRef = storageReference.child("profile_pictures/$userId.jpg")
+                // Exibir a imagem localmente enquanto o upload é feito
+                Picasso.get().load(uri).transform(CropCircleTransformation()).into(imgPerfil)
 
-                imageRef.putFile(uri)
-                    .addOnSuccessListener {
-                        imageRef.downloadUrl.addOnSuccessListener { downloadUri ->
-                            val imageUrl = downloadUri.toString()
-                            saveProfileImageUrlToDatabase(imageUrl)
+                // Upload da imagem para o Cloudinary
+                MediaManager.get().upload(uri)
+                    .option("folder", "perfil_professor") // Especificando a pasta no Cloudinary
+                    .callback(object : UploadCallback {
+                        override fun onStart(requestId: String) {
+                            // Mostrar um Toast ou algum tipo de feedback visual
+                            Toast.makeText(this@PerfilProfessorActivity, "Fazendo upload da imagem...", Toast.LENGTH_SHORT).show()
                         }
-                    }
-                    .addOnFailureListener {
-                        Toast.makeText(this, "Erro ao fazer upload da imagem", Toast.LENGTH_SHORT).show()
-                    }
+
+                        override fun onProgress(requestId: String, bytes: Long, totalBytes: Long) {
+                            // Aqui você pode mostrar o progresso se quiser
+                        }
+
+                        override fun onSuccess(requestId: String, resultData: Map<*, *>) {
+                            // Recupera o URL da imagem após o upload
+                            val imageUrl = resultData["secure_url"] as? String
+                            if (!imageUrl.isNullOrEmpty()) {
+                                // Salvar a URL da imagem no Firestore
+                                saveProfileImageUrlToDatabase(imageUrl)
+                                // Exibir a imagem no ImageView
+                                Picasso.get().load(imageUrl).transform(CropCircleTransformation()).into(imgPerfil)
+                            }
+                        }
+
+                        override fun onError(requestId: String, error: ErrorInfo) {
+                            // Caso ocorra algum erro no upload
+                            Toast.makeText(this@PerfilProfessorActivity, "Erro ao enviar imagem: ${error.description}", Toast.LENGTH_SHORT).show()
+                        }
+
+                        override fun onReschedule(requestId: String, error: ErrorInfo) {
+                            // Caso seja necessário reagendar o upload (isso pode ser útil em casos de falhas temporárias)
+                        }
+                    })
+                    .dispatch()
             }
         }
     }
 
     private fun saveProfileImageUrlToDatabase(imageUrl: String) {
-        val userId = firebaseAuth.currentUser?.uid
-        val firestoreRef = FirebaseFirestore.getInstance().collection("usuarios").document(userId ?: "")
+        // Pega o ID do usuário logado
+        val userId = FirebaseAuth.getInstance().currentUser?.uid
+        if (userId != null) {
+            val firestoreRef = FirebaseFirestore.getInstance().collection("usuarios").document(userId)
 
-        val userMap = mapOf("profileImageUrl" to imageUrl)
+            // Atualiza o Firestore com a URL da imagem
+            val userMap = mapOf("profileImageUrl" to imageUrl)
 
-        firestoreRef.update(userMap)
-            .addOnSuccessListener {
-                Toast.makeText(this, "Imagem de perfil atualizada!", Toast.LENGTH_SHORT).show()
-            }
-            .addOnFailureListener {
-                Toast.makeText(this, "Erro ao salvar imagem de perfil", Toast.LENGTH_SHORT).show()
-            }
+            firestoreRef.update(userMap)
+                .addOnSuccessListener {
+                    Toast.makeText(this, "Imagem de perfil atualizada!", Toast.LENGTH_SHORT).show()
+                }
+                .addOnFailureListener {
+                    Toast.makeText(this, "Erro ao salvar imagem de perfil", Toast.LENGTH_SHORT).show()
+                }
+        } else {
+            Toast.makeText(this, "Usuário não autenticado.", Toast.LENGTH_SHORT).show()
+        }
     }
 
     private fun carregarDadosDoProfessor() {
@@ -269,11 +299,11 @@ class PerfilProfessorActivity : AppCompatActivity() {
                     val telefone = documentSnapshot.getString("telefone")
                     val cref = documentSnapshot.getString("cref")
                     val cidade = documentSnapshot.getString("cidade")
-                    val profileImageUrl = documentSnapshot.getString("profileImageUrl")
 
                     // Tentando pegar as modalidades e adicionar um log para depuração
                     val modalidades = documentSnapshot.get("modalidades") as? List<*>
                     Log.d("Modalidades", "Modalidades do usuário: $modalidades")
+
 
                     edtNome.setText(nome ?: "")
                     edtEmail.setText(email ?: "")
@@ -281,8 +311,9 @@ class PerfilProfessorActivity : AppCompatActivity() {
                     edtCref.setText(cref ?: "")
                     edtCidade.setText(cidade ?: "")
 
+                    val profileImageUrl = documentSnapshot.getString("profileImageUrl")
                     if (!profileImageUrl.isNullOrEmpty()) {
-                        Picasso.get().load(profileImageUrl).into(imgPerfil)
+                        Picasso.get().load(profileImageUrl).transform(CropCircleTransformation()).into(imgPerfil)
                     }
 
                     // Aqui, você precisa garantir que as modalidades sejam corretamente atribuídas

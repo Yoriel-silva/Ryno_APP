@@ -54,6 +54,8 @@ dependencies {
     implementation("com.google.firebase:firebase-firestore")
     implementation("com.google.firebase:firebase-storage")
     implementation("com.google.firebase:firebase-database")
-    implementation("com.squareup.picasso:picasso:2.8")
 
+    implementation("com.squareup.picasso:picasso:2.8")
+    implementation("com.cloudinary:cloudinary-android:3.0.2")
+    implementation("jp.wasabeef:picasso-transformations:2.4.0")
 }
