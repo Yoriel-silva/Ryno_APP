@@ -3,9 +3,11 @@ package com.example.ryno
 import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.media.Image
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import com.cloudinary.android.MediaManager
@@ -20,7 +22,9 @@ import jp.wasabeef.picasso.transformations.CropCircleTransformation
 class PerfilProfessorActivity : AppCompatActivity() {
 
     private lateinit var imgPerfil: ImageView
+    private lateinit var imgEditar : ImageView
     private lateinit var btnSalvar: Button
+    private lateinit var btnEditar: Button
     private lateinit var btnDeslogar: Button
 
     private lateinit var edtNome: EditText
@@ -52,7 +56,10 @@ class PerfilProfessorActivity : AppCompatActivity() {
         firebaseAuth = FirebaseAuth.getInstance()
 
         imgPerfil = findViewById(R.id.imgPerfil)
+        imgEditar = findViewById(R.id.imgEditar)
+
         btnSalvar = findViewById(R.id.btnSalvar)
+        btnEditar = findViewById(R.id.btnEditar)
         btnDeslogar = findViewById(R.id.btnDeslogar)
 
         edtNome = findViewById(R.id.edtNome)
@@ -72,13 +79,34 @@ class PerfilProfessorActivity : AppCompatActivity() {
 
         carregarDadosDoProfessor()
 
+        imgPerfil.isEnabled = false
         imgPerfil.setOnClickListener {
-            val intent = Intent(Intent.ACTION_PICK)
-            intent.type = "image/*"
-            startActivityForResult(intent, 100)
+            if (imgPerfil.isEnabled) {
+                val intent = Intent(Intent.ACTION_PICK)
+                intent.type = "image/*"
+                startActivityForResult(intent, 100)
+            }
         }
 
         cloudinary = com.cloudinary.android.MediaManager.get()
+
+        btnEditar.setOnClickListener {
+            // Tornar campos editáveis
+            edtNome.isEnabled = true
+            edtEmail.isEnabled = true
+            edtTelefone.isEnabled = true
+            edtCref.isEnabled = true
+            edtCidade.isEnabled = true
+            edtModalidades.isEnabled = true
+
+            imgPerfil.isEnabled = true
+
+            imgEditar.visibility = View.VISIBLE
+
+            // Troca os botões
+            btnEditar.visibility = Button.INVISIBLE
+            btnSalvar.visibility = Button.VISIBLE
+        }
 
         btnSalvar.setOnClickListener {
             // Coleta os dados dos campos EditText
@@ -127,6 +155,22 @@ class PerfilProfessorActivity : AppCompatActivity() {
                         Toast.makeText(this, "Erro ao salvar dados", Toast.LENGTH_SHORT).show()
                     }
             }
+
+            // Depois de salvar, voltar para o modo não editável
+            edtNome.isEnabled = false
+            edtEmail.isEnabled = false
+            edtTelefone.isEnabled = false
+            edtCref.isEnabled = false
+            edtCidade.isEnabled = false
+            edtModalidades.isEnabled = false
+
+            imgPerfil.isEnabled = false
+
+            imgEditar.visibility = View.INVISIBLE
+
+            // Troca os botões novamente
+            btnSalvar.visibility = Button.INVISIBLE
+            btnEditar.visibility = Button.VISIBLE
         }
 
         btnDeslogar.setOnClickListener {
