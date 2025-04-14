@@ -64,7 +64,7 @@
         android:fontFamily="@font/concert_one"
         android:inputType="textPersonName"
         android:padding="12dp"
-        android:text="Nome do Professor"
+        android:hint="professor"
         android:textColor="#8900DD"
         android:textColorHint="#8900DD"
         app:layout_constraintEnd_toEndOf="parent"
@@ -89,24 +89,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/edtNome" />
 
-    <TextView
-        android:id="@+id/modalidadeSelecionada"
-        android:layout_width="280dp"
-        android:layout_height="45dp"
-        android:layout_marginTop="12dp"
-        android:background="@drawable/edittext_background"
-        android:clickable="true"
-        android:focusable="false"
-        android:fontFamily="@font/concert_one"
-        android:hint="Escolha uma ou mais modalidades"
-        android:padding="12dp"
-        android:textColor="#8900DD"
-        android:textColorHint="#8900DD"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.476"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/autoCidade" />
-
     <EditText
         android:id="@+id/edtTelefone"
         android:layout_width="280dp"
@@ -124,22 +106,6 @@
         app:layout_constraintTop_toBottomOf="@+id/edtEmail" />
 
     <EditText
-        android:id="@+id/edtSenha"
-        android:layout_width="280dp"
-        android:layout_height="45dp"
-        android:layout_marginTop="12dp"
-        android:background="@drawable/edittext_background"
-        android:fontFamily="@font/concert_one"
-        android:inputType="text"
-        android:padding="12dp"
-        android:text="senha"
-        android:textColor="#8900DD"
-        android:textColorHint="#8900DD"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/edtTelefone" />
-
-    <EditText
         android:id="@+id/edtCref"
         android:layout_width="280dp"
         android:layout_height="45dp"
@@ -153,7 +119,26 @@
         android:textColorHint="#8900DD"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/edtSenha" />
+        app:layout_constraintTop_toBottomOf="@+id/edtTelefone" />
+
+    <TextView
+        android:id="@+id/edtModalidade"
+        android:layout_width="280dp"
+        android:layout_height="45dp"
+        android:layout_marginTop="12dp"
+        android:background="@drawable/edittext_background"
+        android:clickable="true"
+        android:focusable="false"
+        android:fontFamily="@font/concert_one"
+        android:hint="Escolha uma ou mais modalidades"
+        android:padding="12dp"
+        android:textColor="#8900DD"
+        android:textColorHint="#8900DD"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.476"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/edtCref" />
+
 
     <AutoCompleteTextView
         android:id="@+id/autoCidade"
@@ -171,7 +156,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.48"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/edtCref" />
+        app:layout_constraintTop_toBottomOf="@id/edtModalidade" />
 
     <Button
         android:id="@+id/btnSalvar"
@@ -187,7 +172,7 @@
         android:textColor="@color/white"
         android:textSize="16sp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/modalidadeSelecionada" />
+        app:layout_constraintTop_toBottomOf="@+id/autoCidade" />
 
     <Button
         android:id="@+id/btnDeslogar"
@@ -204,7 +189,7 @@
         app:layout_constraintEnd_toStartOf="@+id/btnSalvar"
         app:layout_constraintHorizontal_bias="0.492"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/modalidadeSelecionada" />
+        app:layout_constraintTop_toBottomOf="@+id/autoCidade" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

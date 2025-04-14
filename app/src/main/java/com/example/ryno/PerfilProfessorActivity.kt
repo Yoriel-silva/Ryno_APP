@@ -5,37 +5,72 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
-import android.widget.Button
-import android.widget.ImageView
-import android.widget.Toast
+import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
-import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.firestore.FirebaseFirestore
 import com.squareup.picasso.Picasso
 
 class PerfilProfessorActivity : AppCompatActivity() {
 
     private lateinit var imgPerfil: ImageView
     private lateinit var btnSalvar: Button
+    private lateinit var btnDeslogar: Button
+
+    private lateinit var edtNome: EditText
+    private lateinit var edtEmail: EditText
+    private lateinit var edtTelefone: EditText
+    private lateinit var edtCref: EditText
+
     private lateinit var firebaseAuth: FirebaseAuth
     private lateinit var storageReference: StorageReference
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_perfil_professor)  // Seu layout XML
+        setContentView(R.layout.activity_perfil_professor)
 
-        // Inicialize o Firebase
         firebaseAuth = FirebaseAuth.getInstance()
         storageReference = FirebaseStorage.getInstance().reference
 
         imgPerfil = findViewById(R.id.imgPerfil)
         btnSalvar = findViewById(R.id.btnSalvar)
+        btnDeslogar = findViewById(R.id.btnDeslogar)
 
-        // Definir um ouvinte para o clique da imagem de perfil
+        edtNome = findViewById(R.id.edtNome)
+        edtEmail = findViewById(R.id.edtEmail)
+        edtTelefone = findViewById(R.id.edtTelefone)
+        edtCref = findViewById(R.id.edtCref)
+
+        val userId = firebaseAuth.currentUser?.uid
+        if (userId != null) {
+            val firestoreRef = FirebaseFirestore.getInstance().collection("usuarios").document(userId)
+
+            firestoreRef.get().addOnSuccessListener { documentSnapshot ->
+                if (documentSnapshot.exists()) {
+                    val nome = documentSnapshot.getString("nome")
+                    val email = documentSnapshot.getString("email")
+                    val telefone = documentSnapshot.getString("telefone")
+                    val cref = documentSnapshot.getString("cref")
+                    val profileImageUrl = documentSnapshot.getString("profileImageUrl")
+
+                    edtNome.setText(nome ?: "")
+                    edtEmail.setText(email ?: "")
+                    edtTelefone.setText(telefone ?: "")
+                    edtCref.setText(cref ?: "")
+                    if (!profileImageUrl.isNullOrEmpty()) {
+                        Picasso.get().load(profileImageUrl).into(imgPerfil)
+                    }
+                } else {
+                    Toast.makeText(this, "Usuário não encontrado", Toast.LENGTH_SHORT).show()
+                }
+            }.addOnFailureListener {
+                Toast.makeText(this, "Erro ao carregar dados do perfil", Toast.LENGTH_SHORT).show()
+            }
+        }
+
         imgPerfil.setOnClickListener {
-            // Verifica a permissão de leitura do armazenamento em tempo de execução
             if (checkSelfPermission(android.Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
                 openGallery()
             } else {
@@ -43,14 +78,38 @@ class PerfilProfessorActivity : AppCompatActivity() {
             }
         }
 
-        // Salvar alterações (não relacionado à imagem, mas já configurado no seu layout)
         btnSalvar.setOnClickListener {
-            // Aqui você pode salvar as outras informações do perfil, além da imagem
-            Toast.makeText(this, "Alterações salvas!", Toast.LENGTH_SHORT).show()
+            val nome = edtNome.text.toString()
+            val email = edtEmail.text.toString()
+            val telefone = edtTelefone.text.toString()
+            val cref = edtCref.text.toString()
+
+            val userMap = mapOf(
+                "nome" to nome,
+                "email" to email,
+                "telefone" to telefone,
+                "cref" to cref
+            )
+
+            val userId = firebaseAuth.currentUser?.uid
+            val firestoreRef = FirebaseFirestore.getInstance().collection("usuarios").document(userId ?: "")
+
+            firestoreRef.update(userMap)
+                .addOnSuccessListener {
+                    Toast.makeText(this, "Dados salvos com sucesso!", Toast.LENGTH_SHORT).show()
+                }
+                .addOnFailureListener {
+                    Toast.makeText(this, "Erro ao salvar dados", Toast.LENGTH_SHORT).show()
+                }
+        }
+
+        btnDeslogar.setOnClickListener {
+            firebaseAuth.signOut()
+            startActivity(Intent(this, LoginActivity::class.java))
+            finish()
         }
     }
 
-    // Quando a permissão de armazenamento for concedida
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode == 101 && grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
@@ -60,23 +119,18 @@ class PerfilProfessorActivity : AppCompatActivity() {
         }
     }
 
-    // Metodo para abrir a galeria de imagens
     private fun openGallery() {
         val intent = Intent(Intent.ACTION_PICK)
         intent.type = "image/*"
-        startActivityForResult(intent, 100) // Código 100 para identificar a requisição da galeria
+        startActivityForResult(intent, 100)
     }
 
-    // Metodo para tratar o resultado da seleção da imagem
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == 100 && resultCode == Activity.RESULT_OK) {
             val imageUri: Uri? = data?.data
-
-            // Exibir a imagem na ImageView com Picasso
             Picasso.get().load(imageUri).into(imgPerfil)
 
-            // Enviar a imagem para o Firebase Storage
             imageUri?.let { uri ->
                 val userId = firebaseAuth.currentUser?.uid ?: return@let
                 val imageRef = storageReference.child("profile_pictures/$userId.jpg")
@@ -84,7 +138,6 @@ class PerfilProfessorActivity : AppCompatActivity() {
                 imageRef.putFile(uri)
                     .addOnSuccessListener {
                         imageRef.downloadUrl.addOnSuccessListener { downloadUri ->
-                            // Salvar o URL da imagem no Firebase Database ou onde precisar
                             val imageUrl = downloadUri.toString()
                             saveProfileImageUrlToDatabase(imageUrl)
                         }
@@ -96,20 +149,18 @@ class PerfilProfessorActivity : AppCompatActivity() {
         }
     }
 
-    // Salvar o URL da imagem no Firebase Database
     private fun saveProfileImageUrlToDatabase(imageUrl: String) {
         val userId = firebaseAuth.currentUser?.uid
-        val databaseRef = FirebaseDatabase.getInstance().reference.child("users").child(userId ?: "")
+        val firestoreRef = FirebaseFirestore.getInstance().collection("usuarios").document(userId ?: "")
+
         val userMap = mapOf("profileImageUrl" to imageUrl)
 
-        databaseRef.updateChildren(userMap)
-            .addOnCompleteListener { task ->
-                if (task.isSuccessful) {
-                    Toast.makeText(this, "Imagem de perfil atualizada!", Toast.LENGTH_SHORT).show()
-                } else {
-                    Toast.makeText(this, "Erro ao salvar imagem de perfil", Toast.LENGTH_SHORT).show()
-                }
+        firestoreRef.update(userMap)
+            .addOnSuccessListener {
+                Toast.makeText(this, "Imagem de perfil atualizada!", Toast.LENGTH_SHORT).show()
+            }
+            .addOnFailureListener {
+                Toast.makeText(this, "Erro ao salvar imagem de perfil", Toast.LENGTH_SHORT).show()
             }
     }
 }
-

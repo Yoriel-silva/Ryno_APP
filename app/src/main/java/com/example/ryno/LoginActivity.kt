@@ -7,6 +7,7 @@ import android.text.SpannableString
 import android.text.Spanned
 import android.text.method.LinkMovementMethod
 import android.text.style.ClickableSpan
+import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.EditText
@@ -42,9 +43,9 @@ class LoginActivity : AppCompatActivity() {
                 finish()
             } else {
                 // Caso o tipo de usuário não tenha sido salvo, faça logout e peça o login novamente
-                auth.signOut()
+                //auth.signOut()
                 Toast.makeText(this, "Erro ao carregar o tipo de usuário. Faça login novamente.", Toast.LENGTH_SHORT).show()
-                finish()
+                //finish()
             }
         }
 
@@ -90,8 +91,7 @@ class LoginActivity : AppCompatActivity() {
     }
 
     private fun loginUser(email: String, password: String) {
-        auth.signInWithEmailAndPassword(email, password)
-            .addOnCompleteListener(this) { task ->
+        auth.signInWithEmailAndPassword(email, password).addOnCompleteListener(this) { task ->
                 if (task.isSuccessful) {
                     val user = auth.currentUser
                     val sharedPrefs = getSharedPreferences("app_prefs", MODE_PRIVATE)
@@ -125,9 +125,12 @@ class LoginActivity : AppCompatActivity() {
                                 Toast.makeText(this, "Erro ao obter o tipo de usuário: ${exception.message}", Toast.LENGTH_SHORT).show()
                             }
                     }
-                } else {
-                    Toast.makeText(baseContext, "Falha na autenticação. Tente novamente.", Toast.LENGTH_SHORT).show()
                 }
-            }
+                else {
+                    Toast.makeText(baseContext, "Falha na autenticação. Tente novamente.", Toast.LENGTH_SHORT).show()
+                    task.exception?.let { exception ->
+                        Log.e("Login", "Erro de autenticação: ${exception.message}")}
+                }
+        }
     }
 }
