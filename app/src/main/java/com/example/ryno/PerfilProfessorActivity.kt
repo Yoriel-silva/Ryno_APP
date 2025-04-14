@@ -12,6 +12,7 @@ import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 import com.google.firebase.firestore.FirebaseFirestore
 import com.squareup.picasso.Picasso
+import java.text.Normalizer
 
 class PerfilProfessorActivity : AppCompatActivity() {
 
@@ -23,6 +24,13 @@ class PerfilProfessorActivity : AppCompatActivity() {
     private lateinit var edtEmail: EditText
     private lateinit var edtTelefone: EditText
     private lateinit var edtCref: EditText
+
+    private lateinit var edtCidade: AutoCompleteTextView
+
+    private val cidades = listOf(
+        "São Paulo", "Salvador", "Fortaleza", "Belo Horizonte",
+        "Rio de Janeiro", "Curitiba", "Brasília", "Manaus", "Recife", "Porto Alegre"
+    )
 
     private lateinit var firebaseAuth: FirebaseAuth
     private lateinit var storageReference: StorageReference
@@ -43,6 +51,10 @@ class PerfilProfessorActivity : AppCompatActivity() {
         edtTelefone = findViewById(R.id.edtTelefone)
         edtCref = findViewById(R.id.edtCref)
 
+        edtCidade = findViewById(R.id.edtCidade)
+        val adapter = CidadeAdapter(this, cidades)
+        edtCidade.setAdapter(adapter)
+
         val userId = firebaseAuth.currentUser?.uid
         if (userId != null) {
             val firestoreRef = FirebaseFirestore.getInstance().collection("usuarios").document(userId)
@@ -53,12 +65,15 @@ class PerfilProfessorActivity : AppCompatActivity() {
                     val email = documentSnapshot.getString("email")
                     val telefone = documentSnapshot.getString("telefone")
                     val cref = documentSnapshot.getString("cref")
+
+                    val cidade = documentSnapshot.getString("cidade")
                     val profileImageUrl = documentSnapshot.getString("profileImageUrl")
 
                     edtNome.setText(nome ?: "")
                     edtEmail.setText(email ?: "")
                     edtTelefone.setText(telefone ?: "")
                     edtCref.setText(cref ?: "")
+                    edtCidade.setText(cidade ?: "")
                     if (!profileImageUrl.isNullOrEmpty()) {
                         Picasso.get().load(profileImageUrl).into(imgPerfil)
                     }
@@ -83,12 +98,14 @@ class PerfilProfessorActivity : AppCompatActivity() {
             val email = edtEmail.text.toString()
             val telefone = edtTelefone.text.toString()
             val cref = edtCref.text.toString()
+            val cidade = edtCidade.text.toString()
 
             val userMap = mapOf(
                 "nome" to nome,
                 "email" to email,
                 "telefone" to telefone,
-                "cref" to cref
+                "cref" to cref,
+                "cidade" to cidade
             )
 
             val userId = firebaseAuth.currentUser?.uid
@@ -107,6 +124,41 @@ class PerfilProfessorActivity : AppCompatActivity() {
             firebaseAuth.signOut()
             startActivity(Intent(this, LoginActivity::class.java))
             finish()
+        }
+    }
+
+    class CidadeAdapter(context: android.content.Context, private val cidades: List<String>) :
+        ArrayAdapter<String>(context, android.R.layout.simple_dropdown_item_1line, cidades), Filterable {
+
+        private var resultados: List<String> = listOf()
+
+        private fun normalizar(texto: String): String {
+            return Normalizer.normalize(texto.lowercase(), Normalizer.Form.NFD)
+                .replace("[\\p{InCombiningDiacriticalMarks}]".toRegex(), "")
+        }
+
+        override fun getCount(): Int = resultados.size
+        override fun getItem(position: Int): String = resultados[position]
+
+        override fun getFilter(): Filter {
+            return object : Filter() {
+                override fun performFiltering(constraint: CharSequence?): FilterResults {
+                    val filtro = FilterResults()
+                    if (constraint != null) {
+                        val entrada = normalizar(constraint.toString())
+                        resultados = cidades.filter {
+                            normalizar(it).contains(entrada)
+                        }.take(5)
+                        filtro.values = resultados
+                        filtro.count = resultados.size
+                    }
+                    return filtro
+                }
+
+                override fun publishResults(constraint: CharSequence?, results: FilterResults?) {
+                    notifyDataSetChanged()
+                }
+            }
         }
     }
 
