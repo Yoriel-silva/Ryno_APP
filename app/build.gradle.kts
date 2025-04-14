@@ -58,4 +58,6 @@ dependencies {
     implementation("com.squareup.picasso:picasso:2.8")
     implementation("com.cloudinary:cloudinary-android:3.0.2")
     implementation("jp.wasabeef:picasso-transformations:2.4.0")
+
+    implementation ("com.google.android.material:material:1.11.0")
 }
