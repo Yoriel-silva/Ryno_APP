@@ -24,7 +24,7 @@ class ProfessoresAlunoActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_lista_professores)
+        setContentView(R.layout.activity_professores_aluno)
 
         spinnerModalidade = findViewById(R.id.spinnerModalidade)
         recyclerView = findViewById(R.id.recyclerProfessores)
