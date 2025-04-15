@@ -37,7 +37,7 @@ class LoginActivity : AppCompatActivity() {
             val userType = getSharedPreferences("app_prefs", MODE_PRIVATE).getString("userType", null)
             if (userType != null) {
                 when (userType) {
-                    "aluno" -> startActivity(Intent(this, ModalidadeAlunoActivity::class.java))
+                    "aluno" -> startActivity(Intent(this, ProfessoresAlunoActivity::class.java))
                     "professor" -> startActivity(Intent(this, PerfilProfessorActivity::class.java))
                 }
                 finish()
