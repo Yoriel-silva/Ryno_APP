@@ -60,4 +60,6 @@ dependencies {
     implementation("jp.wasabeef:picasso-transformations:2.4.0")
 
     implementation ("com.google.android.material:material:1.11.0")
+
+    implementation("com.google.code.gson:gson:2.10.1")
 }

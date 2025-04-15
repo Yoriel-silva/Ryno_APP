@@ -30,6 +30,7 @@ class ProfessoresAlunoActivity : AppCompatActivity() {
         val btnAbrirFiltros = findViewById<Button>(R.id.btnAbrirFiltros)
 
         adapter = ProfessorAdapter(emptyList()) { professor ->
+            salvarProfessorVisualizado(professor)
             val bottomSheet = DetalhesProfessorBottomSheet(professor)
             bottomSheet.show(supportFragmentManager, "DetalhesProfessor")
         }
@@ -42,6 +43,11 @@ class ProfessoresAlunoActivity : AppCompatActivity() {
         btnAbrirFiltros.setOnClickListener {
             val intent = Intent(this, ModalidadeAlunoActivity::class.java)
             startActivityForResult(intent, REQUEST_CODE_FILTRO)
+        }
+
+        val btnVerRecentes = findViewById<Button>(R.id.btnVerRecentes)
+        btnVerRecentes.setOnClickListener {
+            startActivity(Intent(this, HistoricoActivity::class.java))
         }
     }
 
@@ -88,5 +94,28 @@ class ProfessoresAlunoActivity : AppCompatActivity() {
             Log.d(TAG, "Professores filtrados: ${filtrados.map { it.nome }}")
             adapter.atualizarLista(filtrados)
         }
+    }
+
+    private fun salvarProfessorVisualizado(professor: Professor) {
+        val sharedPref = getSharedPreferences("professores_recent", MODE_PRIVATE)
+        val listaJson = sharedPref.getString("lista", "[]")
+
+        val gson = com.google.gson.Gson()
+        val listaSalva = gson.fromJson(listaJson, Array<Professor>::class.java)?.toMutableList() ?: mutableListOf()
+
+        // Remove se já existir
+        listaSalva.removeAll { it.email == professor.email }
+
+        // Adiciona no início da lista
+        listaSalva.add(0, professor)
+
+        // Garante que só tenha 5
+        val novaLista = listaSalva.take(5)
+
+        // Salva de novo no SharedPreferences
+        val jsonAtualizado = gson.toJson(novaLista)
+        sharedPref.edit().putString("lista", jsonAtualizado).apply()
+
+        Log.d(TAG, "Professor salvo como visualizado: ${professor.email}")
     }
 }

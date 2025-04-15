@@ -13,6 +13,13 @@
         android:text="Filtrar"
         android:layout_margin="16dp"/>
 
+    <Button
+        android:id="@+id/btnVerRecentes"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Ver Recentes"
+        android:layout_marginTop="8dp"/>
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerProfessores"
         android:layout_width="match_parent"
