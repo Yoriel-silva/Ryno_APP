@@ -1,0 +1,44 @@
+package com.example.ryno
+
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.ImageView
+import android.widget.TextView
+import androidx.recyclerview.widget.RecyclerView
+import com.squareup.picasso.Picasso
+
+class ProfessorAdapter(private var lista: List<Professor>) :
+    RecyclerView.Adapter<ProfessorAdapter.ProfessorViewHolder>() {
+
+    class ProfessorViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+        val nome: TextView = view.findViewById(R.id.txtNome)
+        val cidade: TextView = view.findViewById(R.id.txtCidade)
+        val modalidades: TextView = view.findViewById(R.id.txtModalidades)
+        val imagem: ImageView = view.findViewById(R.id.imgFoto)
+    }
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ProfessorViewHolder {
+        val view = LayoutInflater.from(parent.context)
+            .inflate(R.layout.item_professor, parent, false)
+        return ProfessorViewHolder(view)
+    }
+
+    override fun onBindViewHolder(holder: ProfessorViewHolder, position: Int) {
+        val professor = lista[position]
+        holder.nome.text = professor.nome
+        holder.cidade.text = professor.cidade
+        holder.modalidades.text = professor.modalidades.joinToString(", ")
+
+        professor.profileImageUrl?.let {
+            Picasso.get().load(it).into(holder.imagem)
+        }
+    }
+
+    override fun getItemCount(): Int = lista.size
+
+    fun atualizarLista(novaLista: List<Professor>) {
+        lista = novaLista
+        notifyDataSetChanged()
+    }
+}

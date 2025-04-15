@@ -113,7 +113,7 @@ class LoginActivity : AppCompatActivity() {
 
                                     // Redireciona para a página correspondente
                                     when (userType) {
-                                        "aluno" -> startActivity(Intent(this, ModalidadeAlunoActivity::class.java))
+                                        "aluno" -> startActivity(Intent(this, ProfessoresAlunoActivity::class.java))
                                         "professor" -> startActivity(Intent(this, PerfilProfessorActivity::class.java))
                                     }
                                     finish()
