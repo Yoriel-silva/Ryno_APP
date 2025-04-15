@@ -3,7 +3,6 @@ package com.example.ryno
 import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.media.Image
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
@@ -13,6 +12,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.cloudinary.android.MediaManager
 import com.cloudinary.android.callback.ErrorInfo
 import com.cloudinary.android.callback.UploadCallback
+import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.squareup.picasso.Picasso
@@ -48,6 +48,9 @@ class PerfilProfessorActivity : AppCompatActivity() {
     private lateinit var firebaseAuth: FirebaseAuth
 
     private lateinit var cloudinary: MediaManager
+
+    private lateinit var fusedLocationClient: FusedLocationProviderClient
+    private val REQUEST_CODE_LOCATION = 1001 // Defina um código único para a permissão de localização
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -251,10 +254,15 @@ class PerfilProfessorActivity : AppCompatActivity() {
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (requestCode == 101 && grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-            openGallery()
-        } else {
-            Toast.makeText(this, "Permissão necessária para acessar a galeria.", Toast.LENGTH_SHORT).show()
+
+        when (requestCode) {
+            101 -> { // Permissão para acessar a galeria
+                if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    openGallery()
+                } else {
+                    Toast.makeText(this, "Permissão necessária para acessar a galeria.", Toast.LENGTH_SHORT).show()
+                }
+            }
         }
     }
 
@@ -391,5 +399,4 @@ class PerfilProfessorActivity : AppCompatActivity() {
             }
         }
     }
-
 }

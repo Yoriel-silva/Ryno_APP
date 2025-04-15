@@ -58,7 +58,7 @@ class CadastroAlunoActivity : AppCompatActivity() {
                             .set(alunoData)
                             .addOnSuccessListener {
                                 Toast.makeText(this, "Conta criada com sucesso!", Toast.LENGTH_SHORT).show()
-                                startActivity(Intent(this, ModalidadeAlunoActivity::class.java))
+                                startActivity(Intent(this, ProfessoresAlunoActivity::class.java))
                                 finish()
                             }
                             .addOnFailureListener {

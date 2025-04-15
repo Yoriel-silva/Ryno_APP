@@ -1,11 +1,14 @@
 package com.example.ryno
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.google.firebase.auth.FirebaseAuth
+
 import com.squareup.picasso.Picasso
 
 class ProfessorAdapter(
@@ -45,6 +48,6 @@ class ProfessorAdapter(
 
     fun atualizarLista(novaLista: List<Professor>) {
         lista = novaLista
-        notifyDataSetChanged()
+        notifyDataSetChanged() // 🔄 Garante que tudo seja reprocessado com localização atual
     }
 }

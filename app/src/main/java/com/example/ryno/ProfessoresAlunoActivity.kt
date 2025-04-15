@@ -9,13 +9,20 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import kotlin.math.pow
 
 class ProfessoresAlunoActivity : AppCompatActivity() {
 
     private lateinit var recyclerView: RecyclerView
     private lateinit var adapter: ProfessorAdapter
     private val listaCompleta = mutableListOf<Professor>()
+
+    private var latitudeAluno: Double? = null
+    private var longitudeAluno: Double? = null
+
+    private lateinit var firebaseAuth: FirebaseAuth
 
     companion object {
         const val REQUEST_CODE_FILTRO = 101
@@ -26,19 +33,26 @@ class ProfessoresAlunoActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_professores_aluno)
 
+        firebaseAuth = FirebaseAuth.getInstance()
+
         recyclerView = findViewById(R.id.recyclerProfessores)
         val btnAbrirFiltros = findViewById<Button>(R.id.btnAbrirFiltros)
 
-        adapter = ProfessorAdapter(emptyList()) { professor ->
-            salvarProfessorVisualizado(professor)
-            val bottomSheet = DetalhesProfessorBottomSheet(professor)
-            bottomSheet.show(supportFragmentManager, "DetalhesProfessor")
-        }
+        adapter = ProfessorAdapter(
+            lista = emptyList(),
+            onClick = { professor: Professor ->
+                salvarProfessorVisualizado(professor)
+                val bottomSheet = DetalhesProfessorBottomSheet(professor)
+                bottomSheet.show(supportFragmentManager, "DetalhesProfessor")
+            }
+        )
 
         recyclerView.layoutManager = LinearLayoutManager(this)
         recyclerView.adapter = adapter
 
-        carregarProfessores()
+        carregarLocalizacaoAluno {
+            carregarProfessores()
+        }
 
         btnAbrirFiltros.setOnClickListener {
             val intent = Intent(this, ModalidadeAlunoActivity::class.java)
@@ -49,26 +63,6 @@ class ProfessoresAlunoActivity : AppCompatActivity() {
         btnVerRecentes.setOnClickListener {
             startActivity(Intent(this, HistoricoActivity::class.java))
         }
-    }
-
-    private fun carregarProfessores() {
-        FirebaseFirestore.getInstance()
-            .collection("usuarios")
-            .whereEqualTo("tipo", "professor")
-            .get()
-            .addOnSuccessListener { result ->
-                listaCompleta.clear()
-                for (document in result) {
-                    val professor = document.toObject(Professor::class.java)
-                    Log.d(TAG, "Professor carregado: ${professor.nome}, modalidades: ${professor.modalidades}")
-                    listaCompleta.add(professor)
-                }
-                adapter.atualizarLista(listaCompleta)
-            }
-            .addOnFailureListener {
-                Log.e(TAG, "Erro ao carregar professores", it)
-                Toast.makeText(this, "Erro ao carregar professores", Toast.LENGTH_SHORT).show()
-            }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -117,5 +111,79 @@ class ProfessoresAlunoActivity : AppCompatActivity() {
         sharedPref.edit().putString("lista", jsonAtualizado).apply()
 
         Log.d(TAG, "Professor salvo como visualizado: ${professor.email}")
+    }
+
+    fun calcularDistancia(lat1: Double, lon1: Double, lat2: Double, lon2: Double): Double {
+        val R = 6371 // Raio da Terra em quilômetros
+        val dLat = Math.toRadians(lat2 - lat1)
+        val dLon = Math.toRadians(lon2 - lon1)
+        val a = Math.sin(dLat / 2).pow(2) + Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2)) * Math.sin(dLon / 2).pow(2)
+        val c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
+        return R * c // Retorna a distância em quilômetros
+    }
+
+    private fun carregarLocalizacaoAluno(onComplete: () -> Unit) {
+        val userId = firebaseAuth.currentUser?.uid
+
+        if (userId != null) {
+            FirebaseFirestore.getInstance().collection("usuarios")
+                .document(userId)
+                .get()
+                .addOnSuccessListener { document ->
+                    val localizacao = document.get("localizacao") as? Map<*, *>
+                    if (localizacao != null) {
+                        latitudeAluno = (localizacao["latitude"] as? Number)?.toDouble()
+                        longitudeAluno = (localizacao["longitude"] as? Number)?.toDouble()
+
+                        // Se a localização foi carregada com sucesso, chama onComplete
+                        onComplete()
+                    } else {
+                        Toast.makeText(this, "Localização não encontrada", Toast.LENGTH_SHORT).show()
+                    }
+                }
+                .addOnFailureListener {
+                    Toast.makeText(this, "Erro ao carregar localização do aluno", Toast.LENGTH_SHORT).show()
+                }
+        } else {
+            Toast.makeText(this, "Usuário não logado", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun carregarProfessores() {
+        // Verifica se a localização do aluno foi carregada antes de buscar os professores
+        if (latitudeAluno != null && longitudeAluno != null) {
+            FirebaseFirestore.getInstance()
+                .collection("usuarios")
+                .whereEqualTo("tipo", "professor")
+                .get()
+                .addOnSuccessListener { result ->
+                    listaCompleta.clear()
+                    for (document in result) {
+                        val professor = document.toObject(Professor::class.java)
+                        Log.d(TAG, "Professor carregado: ${professor.nome}, modalidades: ${professor.modalidades}")
+                        listaCompleta.add(professor)
+                    }
+
+                    // Ordenar por distância
+                    listaCompleta.sortBy { professor ->
+                        val latProf = professor.localizacao["latitude"]
+                        val lonProf = professor.localizacao["longitude"]
+                        if (latProf != null && lonProf != null && latitudeAluno != null && longitudeAluno != null) {
+                            calcularDistancia(latitudeAluno!!, longitudeAluno!!, latProf, lonProf)
+                        } else {
+                            Double.MAX_VALUE // Sem localização => manda pro final da lista
+                        }
+                    }
+
+                    adapter.atualizarLista(listaCompleta)
+                }
+                .addOnFailureListener {
+                    Log.e(TAG, "Erro ao carregar professores", it)
+                    Toast.makeText(this, "Erro ao carregar professores", Toast.LENGTH_SHORT).show()
+                }
+        } else {
+            // Caso a localização ainda não tenha sido carregada
+            Toast.makeText(this, "Carregando localização do aluno...", Toast.LENGTH_SHORT).show()
+        }
     }
 }
