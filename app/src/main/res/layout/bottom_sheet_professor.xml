@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:background="@android:color/white"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <ImageView
+        android:id="@+id/imgFoto"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_gravity="center"
+        android:scaleType="centerCrop"
+        android:src="@drawable/ic_default_avatar" />
+
+    <TextView android:id="@+id/txtNome" style="@style/TextAppearance.AppCompat.Large"
+        android:layout_width="100dp"
+        android:layout_height="100dp"/>
+    <TextView android:id="@+id/txtEmail"
+        android:layout_width="100dp"
+        android:layout_height="100dp"/>
+    <TextView android:id="@+id/txtTelefone"
+        android:layout_width="100dp"
+        android:layout_height="100dp"/>
+    <TextView android:id="@+id/txtCidade"
+        android:layout_width="100dp"
+        android:layout_height="100dp"/>
+    <TextView android:id="@+id/txtCref"
+        android:layout_width="100dp"
+        android:layout_height="100dp"/>
+    <TextView android:id="@+id/txtModalidades"
+        android:layout_width="100dp"
+        android:layout_height="100dp"/>
+</LinearLayout>

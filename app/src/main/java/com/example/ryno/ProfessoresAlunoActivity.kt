@@ -29,7 +29,11 @@ class ProfessoresAlunoActivity : AppCompatActivity() {
         spinnerModalidade = findViewById(R.id.spinnerModalidade)
         recyclerView = findViewById(R.id.recyclerProfessores)
 
-        adapter = ProfessorAdapter(emptyList())
+        adapter = ProfessorAdapter(emptyList()) { professor ->
+            val bottomSheet = DetalhesProfessorBottomSheet(professor)
+            bottomSheet.show(supportFragmentManager, "DetalhesProfessor")
+        }
+
         recyclerView.layoutManager = LinearLayoutManager(this)
         recyclerView.adapter = adapter
 

@@ -8,8 +8,10 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.squareup.picasso.Picasso
 
-class ProfessorAdapter(private var lista: List<Professor>) :
-    RecyclerView.Adapter<ProfessorAdapter.ProfessorViewHolder>() {
+class ProfessorAdapter(
+    private var lista: List<Professor>,
+    private val onClick: (Professor) -> Unit
+) : RecyclerView.Adapter<ProfessorAdapter.ProfessorViewHolder>() {
 
     class ProfessorViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val nome: TextView = view.findViewById(R.id.txtNome)
@@ -32,6 +34,10 @@ class ProfessorAdapter(private var lista: List<Professor>) :
 
         professor.profileImageUrl?.let {
             Picasso.get().load(it).into(holder.imagem)
+        }
+
+        holder.itemView.setOnClickListener {
+            onClick(professor)
         }
     }
 
