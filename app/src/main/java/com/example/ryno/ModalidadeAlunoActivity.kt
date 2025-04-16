@@ -19,7 +19,8 @@ class ModalidadeAlunoActivity : AppCompatActivity() {
         val btnAplicar = findViewById<Button>(R.id.btnAplicarFiltros)
         val btnPerfil = findViewById<Button>(R.id.btnPerfil)
 
-        val preSelecionadas = intent.getStringArrayListExtra("modalidadesSelecionadas") ?: arrayListOf()
+        val sharedPref = getSharedPreferences("filtro_prefs", MODE_PRIVATE)
+        val preSelecionadas = sharedPref.getStringSet("modalidadesSelecionadas", emptySet()) ?: emptySet()
 
         modalidades.forEach { modalidade ->
             val checkBox = CheckBox(this).apply {
@@ -34,15 +35,25 @@ class ModalidadeAlunoActivity : AppCompatActivity() {
                 .filter { it.isChecked }
                 .map { it.text.toString() }
 
-            val intent = Intent()
-            intent.putStringArrayListExtra("modalidadesSelecionadas", ArrayList(selecionadas))
+            val sharedPref = getSharedPreferences("filtro_prefs", MODE_PRIVATE)
+            sharedPref.edit().putStringSet("modalidadesSelecionadas", selecionadas.toSet()).apply()
 
-            setResult(RESULT_OK, intent)
+            val intent = Intent(this, ProfessoresAlunoActivity::class.java)
+            startActivity(intent)
             finish()
         }
+
         btnPerfil.setOnClickListener {
+            val selecionadas = checkBoxList
+                .filter { it.isChecked }
+                .map { it.text.toString() }
+
+            val sharedPref = getSharedPreferences("filtro_prefs", MODE_PRIVATE)
+            sharedPref.edit().putStringSet("modalidadesSelecionadas", selecionadas.toSet()).apply()
+
             val intent = Intent(this, PerfilAlunoActivity::class.java)
             startActivity(intent)
+            finish()
         }
     }
 }

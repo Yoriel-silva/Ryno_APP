@@ -59,7 +59,6 @@ class ProfessoresAlunoActivity : AppCompatActivity() {
 
         btnAbrirFiltros.setOnClickListener {
             val intent = Intent(this, ModalidadeAlunoActivity::class.java)
-            intent.putStringArrayListExtra("modalidadesSelecionadas", ArrayList(ultimasSelecionadas))
             startActivityForResult(intent, REQUEST_CODE_FILTRO)
         }
 
@@ -74,28 +73,47 @@ class ProfessoresAlunoActivity : AppCompatActivity() {
         }
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
+//    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+//        super.onActivityResult(requestCode, resultCode, data)
+//
+//        if (requestCode == REQUEST_CODE_FILTRO && resultCode == Activity.RESULT_OK) {
+//            val selecionadas = data?.getStringArrayListExtra("modalidadesSelecionadas") ?: return
+//            Log.d("filtro", "Modalidades selecionadas no filtro: $selecionadas")
+//            ultimasSelecionadas = selecionadas
+//            filtrarProfessoresPorModalidades(selecionadas)
+//        }
+//        Log.d("filtro", "Chamou mais não validou.")
+//    }
 
-        if (requestCode == REQUEST_CODE_FILTRO && resultCode == Activity.RESULT_OK) {
-            val selecionadas = data?.getStringArrayListExtra("modalidadesSelecionadas") ?: return
-            Log.d(TAG, "Modalidades selecionadas no filtro: $selecionadas")
-            ultimasSelecionadas = selecionadas
-            filtrarProfessoresPorModalidades(selecionadas)
-        }
+    override fun onResume() {
+        super.onResume()
+        carregarProfessores()
     }
 
-    private fun filtrarProfessoresPorModalidades(selecionadas: List<String>) {
+    private fun filtrarProfessoresPorModalidades() {
+        val sharedPref = getSharedPreferences("filtro_prefs", MODE_PRIVATE)
+        val selecionadas = sharedPref.getStringSet("modalidadesSelecionadas", emptySet())?.toList() ?: emptyList()
         if (selecionadas.isEmpty()) {
-            Log.d(TAG, "Nenhuma modalidade selecionada. Exibindo lista completa.")
+            Log.d("filtro", "Nenhuma modalidade selecionada. Exibindo lista completa.")
             adapter.atualizarLista(listaCompleta)
         } else {
+            Log.d("filtro", "Selecionadas: $selecionadas")
+            listaCompleta.forEach {
+                Log.d("filtro", "${it.nome} => ${it.modalidades}")
+            }
             val filtrados = listaCompleta.filter { professor ->
-                Log.d(TAG, "Verificando professor: ${professor.nome}, modalidades: ${professor.modalidades}")
-                selecionadas.all { it in professor.modalidades }
+                Log.d("filtro", "Professor: ${professor.nome}")
+                selecionadas.forEach { selecionada ->
+                    val passou = professor.modalidades.any { it.trim() == selecionada.trim() }
+                    Log.d("filtro", " - Modalidade '$selecionada' encontrada em ${professor.modalidades}? $passou")
+                }
+
+                val resultado = selecionadas.all { it.trim() in professor.modalidades.map { m -> m.trim() } }
+                Log.d("filtro", "Professor ${professor.nome} passou? $resultado")
+                resultado
             }
 
-            Log.d(TAG, "Professores filtrados: ${filtrados.map { it.nome }}")
+            Log.d("filtro", "Professores filtrados: ${filtrados.map { it.nome }}")
             adapter.atualizarLista(filtrados)
         }
     }
@@ -187,6 +205,7 @@ class ProfessoresAlunoActivity : AppCompatActivity() {
 
                     // Agora ordena
                     listaCompleta.sortBy { it.distanciaKm }
+                    filtrarProfessoresPorModalidades()
 
 //                    Ordenar por distância
 //                    listaCompleta.sortBy { professor ->
@@ -199,7 +218,7 @@ class ProfessoresAlunoActivity : AppCompatActivity() {
 //                        }
 //                    }
 
-                    adapter.atualizarLista(listaCompleta)
+                    //adapter.atualizarLista(listaCompleta)
                 }
                 .addOnFailureListener {
                     Log.e(TAG, "Erro ao carregar professores", it)
