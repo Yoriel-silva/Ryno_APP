@@ -39,6 +39,7 @@ class ProfessoresAlunoActivity : AppCompatActivity() {
 
         recyclerView = findViewById(R.id.recyclerProfessores)
         val btnAbrirFiltros = findViewById<Button>(R.id.btnAbrirFiltros)
+        val btnPerfil = findViewById<Button>(R.id.btnPerfil)
 
         adapter = ProfessorAdapter(
             lista = emptyList(),
@@ -65,6 +66,11 @@ class ProfessoresAlunoActivity : AppCompatActivity() {
         val btnVerRecentes = findViewById<Button>(R.id.btnVerRecentes)
         btnVerRecentes.setOnClickListener {
             startActivity(Intent(this, HistoricoActivity::class.java))
+        }
+
+        btnPerfil.setOnClickListener {
+            val intent = Intent(this, PerfilAlunoActivity::class.java)
+            startActivity(intent)
         }
     }
 

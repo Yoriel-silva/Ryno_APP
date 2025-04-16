@@ -11,11 +11,16 @@ class PerfilAlunoActivity : AppCompatActivity() {
         setContentView(R.layout.activity_perfil_aluno)
 
 
-        // Codigo botão login
-        val buttonLogin = findViewById<Button>(R.id.buttonConfirmar) // 1. Referencia o botão pelo ID
+        val buttonModalidade = findViewById<Button>(R.id.btnModalidades)
+        val buttonProfessores = findViewById<Button>(R.id.btnProfessores)
 
-        buttonLogin.setOnClickListener {
+        buttonModalidade.setOnClickListener {
             val intent = Intent(this, ModalidadeAlunoActivity::class.java)
+            startActivity(intent)
+            finish()
+        }
+        buttonProfessores.setOnClickListener {
+            val intent = Intent(this, ProfessoresAlunoActivity::class.java)
             startActivity(intent)
             finish()
         }

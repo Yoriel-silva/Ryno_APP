@@ -17,6 +17,7 @@ class ModalidadeAlunoActivity : AppCompatActivity() {
 
         val containerCheckboxes = findViewById<LinearLayout>(R.id.containerCheckboxesFiltro)
         val btnAplicar = findViewById<Button>(R.id.btnAplicarFiltros)
+        val btnPerfil = findViewById<Button>(R.id.btnPerfil)
 
         val preSelecionadas = intent.getStringArrayListExtra("modalidadesSelecionadas") ?: arrayListOf()
 
@@ -38,6 +39,10 @@ class ModalidadeAlunoActivity : AppCompatActivity() {
 
             setResult(RESULT_OK, intent)
             finish()
+        }
+        btnPerfil.setOnClickListener {
+            val intent = Intent(this, PerfilAlunoActivity::class.java)
+            startActivity(intent)
         }
     }
 }
