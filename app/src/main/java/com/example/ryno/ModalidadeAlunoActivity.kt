@@ -18,8 +18,12 @@ class ModalidadeAlunoActivity : AppCompatActivity() {
         val containerCheckboxes = findViewById<LinearLayout>(R.id.containerCheckboxesFiltro)
         val btnAplicar = findViewById<Button>(R.id.btnAplicarFiltros)
 
+        val preSelecionadas = intent.getStringArrayListExtra("modalidadesSelecionadas") ?: arrayListOf()
+
         modalidades.forEach { modalidade ->
-            val checkBox = CheckBox(this).apply { text = modalidade }
+            val checkBox = CheckBox(this).apply {
+                text = modalidade
+                isChecked = preSelecionadas.contains(modalidade)}
             checkBoxList.add(checkBox)
             containerCheckboxes.addView(checkBox)
         }

@@ -24,6 +24,8 @@ class ProfessoresAlunoActivity : AppCompatActivity() {
 
     private lateinit var firebaseAuth: FirebaseAuth
 
+    private var ultimasSelecionadas: List<String> = emptyList()
+
     companion object {
         const val REQUEST_CODE_FILTRO = 101
         const val TAG = "ProfessoresAluno"
@@ -56,6 +58,7 @@ class ProfessoresAlunoActivity : AppCompatActivity() {
 
         btnAbrirFiltros.setOnClickListener {
             val intent = Intent(this, ModalidadeAlunoActivity::class.java)
+            intent.putStringArrayListExtra("modalidadesSelecionadas", ArrayList(ultimasSelecionadas))
             startActivityForResult(intent, REQUEST_CODE_FILTRO)
         }
 
@@ -71,6 +74,7 @@ class ProfessoresAlunoActivity : AppCompatActivity() {
         if (requestCode == REQUEST_CODE_FILTRO && resultCode == Activity.RESULT_OK) {
             val selecionadas = data?.getStringArrayListExtra("modalidadesSelecionadas") ?: return
             Log.d(TAG, "Modalidades selecionadas no filtro: $selecionadas")
+            ultimasSelecionadas = selecionadas
             filtrarProfessoresPorModalidades(selecionadas)
         }
     }
