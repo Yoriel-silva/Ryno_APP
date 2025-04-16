@@ -21,6 +21,7 @@ class ProfessorAdapter(
         val cidade: TextView = view.findViewById(R.id.txtCidade)
         val modalidades: TextView = view.findViewById(R.id.txtModalidades)
         val imagem: ImageView = view.findViewById(R.id.imgFoto)
+        val distancia: TextView = view.findViewById(R.id.txtDistancia)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ProfessorViewHolder {
@@ -34,6 +35,9 @@ class ProfessorAdapter(
         holder.nome.text = professor.nome
         holder.cidade.text = professor.cidade
         holder.modalidades.text = professor.modalidades.joinToString(", ")
+        holder.distancia.text = professor.distanciaKm?.let {
+            "Distância: %.2f km".format(it)
+        } ?: "Distância desconhecida"
 
         professor.profileImageUrl?.let {
             Picasso.get().load(it).into(holder.imagem)

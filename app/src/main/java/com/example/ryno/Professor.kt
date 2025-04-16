@@ -10,5 +10,6 @@ data class Professor(
     val cref: String = "",
     val modalidades: List<String> = emptyList(),
     val profileImageUrl: String? = null,
-    val localizacao: Map<String, Double> = emptyMap()
+    val localizacao: Map<String, Double> = emptyMap(),
+    var distanciaKm: Double? = null
 ) : Serializable

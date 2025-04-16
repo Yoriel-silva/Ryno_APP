@@ -164,16 +164,30 @@ class ProfessoresAlunoActivity : AppCompatActivity() {
                         listaCompleta.add(professor)
                     }
 
-                    // Ordenar por distância
-                    listaCompleta.sortBy { professor ->
+                    listaCompleta.forEach { professor ->
                         val latProf = professor.localizacao["latitude"]
                         val lonProf = professor.localizacao["longitude"]
                         if (latProf != null && lonProf != null && latitudeAluno != null && longitudeAluno != null) {
-                            calcularDistancia(latitudeAluno!!, longitudeAluno!!, latProf, lonProf)
+                            val distancia = calcularDistancia(latitudeAluno!!, longitudeAluno!!, latProf, lonProf)
+                            professor.distanciaKm = distancia
                         } else {
-                            Double.MAX_VALUE // Sem localização => manda pro final da lista
+                            professor.distanciaKm = Double.MAX_VALUE
                         }
                     }
+
+                    // Agora ordena
+                    listaCompleta.sortBy { it.distanciaKm }
+
+//                    Ordenar por distância
+//                    listaCompleta.sortBy { professor ->
+//                        val latProf = professor.localizacao["latitude"]
+//                        val lonProf = professor.localizacao["longitude"]
+//                        if (latProf != null && lonProf != null && latitudeAluno != null && longitudeAluno != null) {
+//                            calcularDistancia(latitudeAluno!!, longitudeAluno!!, latProf, lonProf)
+//                        } else {
+//                            Double.MAX_VALUE // Sem localização => manda pro final da lista
+//                        }
+//                    }
 
                     adapter.atualizarLista(listaCompleta)
                 }
