@@ -87,11 +87,14 @@ class ProfessoresAlunoActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        carregarProfessores()
+        carregarLocalizacaoAluno {
+            carregarProfessores()
+        }
     }
 
     private fun filtrarProfessoresPorModalidades() {
-        val sharedPref = getSharedPreferences("filtro_prefs", MODE_PRIVATE)
+        val userId = FirebaseAuth.getInstance().currentUser?.uid ?: "default"
+        val sharedPref = getSharedPreferences("filtro_prefs_$userId", MODE_PRIVATE)
         val selecionadas = sharedPref.getStringSet("modalidadesSelecionadas", emptySet())?.toList() ?: emptyList()
         if (selecionadas.isEmpty()) {
             Log.d("filtro", "Nenhuma modalidade selecionada. Exibindo lista completa.")
@@ -119,7 +122,8 @@ class ProfessoresAlunoActivity : AppCompatActivity() {
     }
 
     private fun salvarProfessorVisualizado(professor: Professor) {
-        val sharedPref = getSharedPreferences("professores_recent", MODE_PRIVATE)
+        val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
+        val sharedPref = getSharedPreferences("professores_recent_$userId", MODE_PRIVATE)
         val listaJson = sharedPref.getString("lista", "[]")
 
         val gson = com.google.gson.Gson()
@@ -151,35 +155,47 @@ class ProfessoresAlunoActivity : AppCompatActivity() {
     }
 
     private fun carregarLocalizacaoAluno(onComplete: () -> Unit) {
+        Log.e("Localizacao", "Função chamada", )
         val userId = firebaseAuth.currentUser?.uid
 
         if (userId != null) {
+            Log.e("Localizacao", "userId: ${userId}", )
             FirebaseFirestore.getInstance().collection("usuarios")
                 .document(userId)
                 .get()
                 .addOnSuccessListener { document ->
+                    Log.e("Localizacao", "Entrou" )
                     val localizacao = document.get("localizacao") as? Map<*, *>
                     if (localizacao != null) {
                         latitudeAluno = (localizacao["latitude"] as? Number)?.toDouble()
                         longitudeAluno = (localizacao["longitude"] as? Number)?.toDouble()
 
                         // Se a localização foi carregada com sucesso, chama onComplete
+                        Log.e("Localizacao", "latitude carregada: ${latitudeAluno}", )
+                        Log.e("Localizacao", "longitude carregada: ${longitudeAluno}")
+                        Log.e("Localizacao", "localizacao carregada", )
                         onComplete()
                     } else {
                         Toast.makeText(this, "Localização não encontrada", Toast.LENGTH_SHORT).show()
+                        Log.e("Localizacao", "localizacao não encontrada", )
                     }
                 }
                 .addOnFailureListener {
                     Toast.makeText(this, "Erro ao carregar localização do aluno", Toast.LENGTH_SHORT).show()
+                    Log.e("Localizacao", "erro ao carregar localizacao", )
                 }
         } else {
             Toast.makeText(this, "Usuário não logado", Toast.LENGTH_SHORT).show()
+            Log.e("Localizacao", "Usuário não logado", )
         }
     }
 
     private fun carregarProfessores() {
         // Verifica se a localização do aluno foi carregada antes de buscar os professores
+        Log.e("Localizacao", "latitude carregada2: ${latitudeAluno}", )
+        Log.e("Localizacao", "longitude carregada2: ${longitudeAluno}")
         if (latitudeAluno != null && longitudeAluno != null) {
+            Log.e("Localizacao", "Entrou 2")
             FirebaseFirestore.getInstance()
                 .collection("usuarios")
                 .whereEqualTo("tipo", "professor")
@@ -227,6 +243,9 @@ class ProfessoresAlunoActivity : AppCompatActivity() {
         } else {
             // Caso a localização ainda não tenha sido carregada
             Toast.makeText(this, "Carregando localização do aluno...", Toast.LENGTH_SHORT).show()
+            Log.e("Localizacao", "latitude: ${latitudeAluno}", )
+            Log.e("Localizacao", "longitude: ${longitudeAluno}", )
+
         }
     }
 }

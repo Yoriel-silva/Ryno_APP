@@ -40,6 +40,8 @@
 
         <activity android:name=".HistoricoActivity" />
 
+        <activity android:name=".InformacoesActivity" />
+
     </application>
 
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>

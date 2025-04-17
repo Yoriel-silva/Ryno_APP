@@ -6,6 +6,7 @@ import android.widget.Button
 import android.widget.CheckBox
 import android.widget.LinearLayout
 import androidx.appcompat.app.AppCompatActivity
+import com.google.firebase.auth.FirebaseAuth
 
 class ModalidadeAlunoActivity : AppCompatActivity() {
     private val modalidades = arrayOf("Futebol", "Basquete", "Vôlei", "Natação")
@@ -19,7 +20,8 @@ class ModalidadeAlunoActivity : AppCompatActivity() {
         val btnAplicar = findViewById<Button>(R.id.btnAplicarFiltros)
         val btnPerfil = findViewById<Button>(R.id.btnPerfil)
 
-        val sharedPref = getSharedPreferences("filtro_prefs", MODE_PRIVATE)
+        val userId = FirebaseAuth.getInstance().currentUser?.uid ?: "default"
+        val sharedPref = getSharedPreferences("filtro_prefs_$userId", MODE_PRIVATE)
         val preSelecionadas = sharedPref.getStringSet("modalidadesSelecionadas", emptySet()) ?: emptySet()
 
         modalidades.forEach { modalidade ->
@@ -35,7 +37,8 @@ class ModalidadeAlunoActivity : AppCompatActivity() {
                 .filter { it.isChecked }
                 .map { it.text.toString() }
 
-            val sharedPref = getSharedPreferences("filtro_prefs", MODE_PRIVATE)
+            val userId = FirebaseAuth.getInstance().currentUser?.uid ?: "default"
+            val sharedPref = getSharedPreferences("filtro_prefs_$userId", MODE_PRIVATE)
             sharedPref.edit().putStringSet("modalidadesSelecionadas", selecionadas.toSet()).apply()
 
             val intent = Intent(this, ProfessoresAlunoActivity::class.java)
@@ -48,7 +51,8 @@ class ModalidadeAlunoActivity : AppCompatActivity() {
                 .filter { it.isChecked }
                 .map { it.text.toString() }
 
-            val sharedPref = getSharedPreferences("filtro_prefs", MODE_PRIVATE)
+            val userId = FirebaseAuth.getInstance().currentUser?.uid ?: "default"
+            val sharedPref = getSharedPreferences("filtro_prefs_$userId", MODE_PRIVATE)
             sharedPref.edit().putStringSet("modalidadesSelecionadas", selecionadas.toSet()).apply()
 
             val intent = Intent(this, PerfilAlunoActivity::class.java)

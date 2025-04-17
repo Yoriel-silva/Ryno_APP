@@ -11,8 +11,22 @@ class PerfilAlunoActivity : AppCompatActivity() {
         setContentView(R.layout.activity_perfil_aluno)
 
 
+        val buttonHistorico = findViewById<Button>(R.id.btnHistorico)
+        val buttonInformações = findViewById<Button>(R.id.btnInformacoes)
+
         val buttonModalidade = findViewById<Button>(R.id.btnModalidades)
         val buttonProfessores = findViewById<Button>(R.id.btnProfessores)
+
+        buttonHistorico.setOnClickListener {
+            val intent = Intent(this, HistoricoActivity::class.java)
+            startActivity(intent)
+            finish()
+        }
+        buttonInformações.setOnClickListener {
+            val intent = Intent(this, InformacoesActivity::class.java)
+            startActivity(intent)
+            finish()
+        }
 
         buttonModalidade.setOnClickListener {
             val intent = Intent(this, ModalidadeAlunoActivity::class.java)

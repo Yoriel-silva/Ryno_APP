@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.auth.FirebaseAuth
 
 import com.squareup.picasso.Picasso
+import jp.wasabeef.picasso.transformations.CropCircleTransformation
 
 class ProfessorAdapter(
     private var lista: List<Professor>,
@@ -40,7 +41,7 @@ class ProfessorAdapter(
         } ?: "Distância desconhecida"
 
         professor.profileImageUrl?.let {
-            Picasso.get().load(it).into(holder.imagem)
+            Picasso.get().load(it).transform(CropCircleTransformation()).into(holder.imagem)
         }
 
         holder.itemView.setOnClickListener {
