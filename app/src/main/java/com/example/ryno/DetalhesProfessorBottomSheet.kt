@@ -8,6 +8,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.squareup.picasso.Picasso
+import jp.wasabeef.picasso.transformations.CropCircleTransformation
 
 class DetalhesProfessorBottomSheet(private val professor: Professor) : BottomSheetDialogFragment() {
 
@@ -22,7 +23,7 @@ class DetalhesProfessorBottomSheet(private val professor: Professor) : BottomShe
         view.findViewById<TextView>(R.id.txtModalidades).text = "Modalidades: ${professor.modalidades.joinToString(", ")}"
 
         professor.profileImageUrl?.let {
-            Picasso.get().load(it).into(view.findViewById(R.id.imgFoto) as ImageView)
+            Picasso.get().load(it).transform(CropCircleTransformation()).into(view.findViewById(R.id.imgFoto) as ImageView)
         }
 
         return view

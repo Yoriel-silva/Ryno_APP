@@ -2,9 +2,9 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:padding="16dp"
-    android:background="@android:color/white"
+    android:background="#3D3D3D"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="match_parent">
 
     <ImageView
         android:id="@+id/imgFoto"
@@ -14,22 +14,63 @@
         android:scaleType="centerCrop"
         android:src="@drawable/ic_default_avatar" />
 
-    <TextView android:id="@+id/txtNome" style="@style/TextAppearance.AppCompat.Large"
-        android:layout_width="100dp"
-        android:layout_height="100dp"/>
+    <TextView android:id="@+id/txtNome"
+        style="@style/TextAppearance.AppCompat.Large"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/concert_one"
+        android:layout_marginTop="20dp"
+        android:textColor="#8900DD"
+        android:textSize="30sp"
+        android:textStyle="normal"/>
+
     <TextView android:id="@+id/txtEmail"
-        android:layout_width="100dp"
-        android:layout_height="100dp"/>
+        style="@style/TextAppearance.AppCompat.Large"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/concert_one"
+        android:layout_marginTop="20dp"
+        android:textColor="#8900DD"
+        android:textSize="30sp"
+        android:textStyle="normal"/>
+
     <TextView android:id="@+id/txtTelefone"
-        android:layout_width="100dp"
-        android:layout_height="100dp"/>
+        style="@style/TextAppearance.AppCompat.Large"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/concert_one"
+        android:layout_marginTop="20dp"
+        android:textColor="#8900DD"
+        android:textSize="30sp"
+        android:textStyle="normal"/>
+
     <TextView android:id="@+id/txtCidade"
-        android:layout_width="100dp"
-        android:layout_height="100dp"/>
+        style="@style/TextAppearance.AppCompat.Large"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/concert_one"
+        android:layout_marginTop="20dp"
+        android:textColor="#8900DD"
+        android:textSize="30sp"
+        android:textStyle="normal"/>
+
     <TextView android:id="@+id/txtCref"
-        android:layout_width="100dp"
-        android:layout_height="100dp"/>
+        style="@style/TextAppearance.AppCompat.Large"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/concert_one"
+        android:layout_marginTop="20dp"
+        android:textColor="#8900DD"
+        android:textSize="30sp"
+        android:textStyle="normal"/>
+
     <TextView android:id="@+id/txtModalidades"
-        android:layout_width="100dp"
-        android:layout_height="100dp"/>
+        style="@style/TextAppearance.AppCompat.Large"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/concert_one"
+        android:layout_marginTop="20dp"
+        android:textColor="#8900DD"
+        android:textSize="30sp"
+        android:textStyle="normal"/>
 </LinearLayout>

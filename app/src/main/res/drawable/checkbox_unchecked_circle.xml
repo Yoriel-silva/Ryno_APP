@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="oval">
+    <stroke android:width="2dp" android:color="#CCCCCC"/>
+    <solid android:color="#FFFFFF"/>
+    <size android:width="24dp" android:height="24dp"/>
+    <!-- Cor de fundo -->
+    <solid android:color="#FFFFFF"/> <!-- Cor de fundo do checkbox -->
+    <!-- Cor da borda -->
+    <stroke
+        android:color="#8E24AA"
+        android:width="2dp"/> <!-- Grossura da borda -->
+    <!-- Bordas arredondadas -->
+    <corners android:radius="12dp"/>
+</shape>

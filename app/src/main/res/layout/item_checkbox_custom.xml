@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/checkbox_background"
+    android:padding="12dp"
+    android:layout_margin="10dp"
+    android:orientation="horizontal"
+    android:gravity="center_vertical">
+
+    <ImageView
+        android:id="@+id/iconModalidade"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:src="@drawable/ic_ryno"
+        android:contentDescription="Ícone da modalidade"
+        android:layout_marginEnd="12dp"/>
+
+    <TextView
+        android:id="@+id/nomeModalidade"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Modalidade"
+        android:textColor="#000"
+        android:layout_weight="1"
+        android:textSize="16sp"/>
+
+    <CheckBox
+        android:id="@+id/customCheckBox"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:button="@drawable/custom_checkbox_button" /> <!-- seu ícone -->
+</LinearLayout>

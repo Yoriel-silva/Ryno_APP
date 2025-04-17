@@ -60,16 +60,13 @@ class ProfessoresAlunoActivity : AppCompatActivity() {
         btnAbrirFiltros.setOnClickListener {
             val intent = Intent(this, ModalidadeAlunoActivity::class.java)
             startActivityForResult(intent, REQUEST_CODE_FILTRO)
-        }
-
-        val btnVerRecentes = findViewById<Button>(R.id.btnVerRecentes)
-        btnVerRecentes.setOnClickListener {
-            startActivity(Intent(this, HistoricoActivity::class.java))
+            finish()
         }
 
         btnPerfil.setOnClickListener {
             val intent = Intent(this, PerfilAlunoActivity::class.java)
             startActivity(intent)
+            finish()
         }
     }
 
