@@ -1,14 +1,27 @@
 package com.example.ryno
 
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.graphics.BitmapShader
+import android.graphics.Canvas
+import android.graphics.Matrix
+import android.graphics.Paint
+import android.graphics.Shader
+import android.media.ExifInterface
 import android.net.Uri
 import android.os.Bundle
+import android.os.Environment
+import android.provider.MediaStore
 import android.util.Log
 import android.view.View
 import android.widget.*
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.FileProvider
 import com.cloudinary.android.MediaManager
 import com.cloudinary.android.callback.ErrorInfo
 import com.cloudinary.android.callback.UploadCallback
@@ -18,6 +31,8 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.squareup.picasso.Picasso
 import java.text.Normalizer
 import jp.wasabeef.picasso.transformations.CropCircleTransformation
+import java.io.File
+import java.io.FileOutputStream
 
 class InformacoesActivity : AppCompatActivity() {
 
@@ -36,6 +51,10 @@ class InformacoesActivity : AppCompatActivity() {
     private lateinit var firebaseAuth: FirebaseAuth
 
     private lateinit var cloudinary: MediaManager
+
+    private val REQUEST_CODE_CAMERA = 101
+    private val REQUEST_CODE_GALLERY = 100
+    private var imageUri: Uri? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -58,11 +77,10 @@ class InformacoesActivity : AppCompatActivity() {
         carregarDadosDoAluno()
 
         imgPerfil.isEnabled = false
+
         imgPerfil.setOnClickListener {
             if (imgPerfil.isEnabled) {
-                val intent = Intent(Intent.ACTION_PICK)
-                intent.type = "image/*"
-                startActivityForResult(intent, 100)
+                escolherFonteImagem()
             }
         }
 
@@ -147,6 +165,11 @@ class InformacoesActivity : AppCompatActivity() {
                     Toast.makeText(this, "Permissão necessária para acessar a galeria.", Toast.LENGTH_SHORT).show()
                 }
             }
+            200 -> {
+                if (grantResults.any { it != PackageManager.PERMISSION_GRANTED }) {
+                    Toast.makeText(this, "Permissões necessárias não concedidas", Toast.LENGTH_SHORT).show()
+                }
+            }
         }
     }
 
@@ -158,48 +181,90 @@ class InformacoesActivity : AppCompatActivity() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == 100 && resultCode == Activity.RESULT_OK) {
-            val imageUri: Uri? = data?.data
-            imageUri?.let { uri ->
-                // Exibir a imagem localmente enquanto o upload é feito
-                Picasso.get().load(uri).transform(CropCircleTransformation()).into(imgPerfil)
 
-                // Upload da imagem para o Cloudinary
-                MediaManager.get().upload(uri)
-                    .option("folder", "perfil_professor") // Especificando a pasta no Cloudinary
-                    .callback(object : UploadCallback {
-                        override fun onStart(requestId: String) {
-                            // Mostrar um Toast ou algum tipo de feedback visual
-                            Toast.makeText(this@InformacoesActivity, "Fazendo upload da imagem...", Toast.LENGTH_SHORT).show()
-                        }
-
-                        override fun onProgress(requestId: String, bytes: Long, totalBytes: Long) {
-                            // Aqui você pode mostrar o progresso se quiser
-                        }
-
-                        override fun onSuccess(requestId: String, resultData: Map<*, *>) {
-                            // Recupera o URL da imagem após o upload
-                            val imageUrl = resultData["secure_url"] as? String
-                            if (!imageUrl.isNullOrEmpty()) {
-                                // Salvar a URL da imagem no Firestore
-                                saveProfileImageUrlToDatabase(imageUrl)
-                                // Exibir a imagem no ImageView
-                                Picasso.get().load(imageUrl).transform(CropCircleTransformation()).into(imgPerfil)
-                            }
-                        }
-
-                        override fun onError(requestId: String, error: ErrorInfo) {
-                            // Caso ocorra algum erro no upload
-                            Toast.makeText(this@InformacoesActivity, "Erro ao enviar imagem: ${error.description}", Toast.LENGTH_SHORT).show()
-                        }
-
-                        override fun onReschedule(requestId: String, error: ErrorInfo) {
-                            // Caso seja necessário reagendar o upload (isso pode ser útil em casos de falhas temporárias)
-                        }
-                    })
-                    .dispatch()
+        if (resultCode == Activity.RESULT_OK) {
+            when (requestCode) {
+                REQUEST_CODE_GALLERY -> {
+                    val uri = data?.data
+                    uri?.let {
+                        exibirImagemEEnviar(it)
+                    }
+                }
+                REQUEST_CODE_CAMERA -> {
+                    imageUri?.let {
+                        exibirImagemEEnviar(it)
+                    }
+                }
             }
         }
+    }
+
+    private fun escolherFonteImagem() {
+        val opcoes = arrayOf("Câmera", "Galeria")
+        val builder = AlertDialog.Builder(this)
+        builder.setTitle("Escolher imagem de perfil")
+        builder.setItems(opcoes) { _, which ->
+            when (which) {
+                0 -> abrirCamera()
+                1 -> openGallery()
+            }
+        }
+        builder.show()
+    }
+
+    private fun abrirCamera() {
+        val cameraIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+        if (cameraIntent.resolveActivity(packageManager) != null) {
+            val photoFile = criarArquivoImagem()
+            imageUri = FileProvider.getUriForFile(this, "${packageName}.provider", photoFile)
+            cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri)
+            startActivityForResult(cameraIntent, REQUEST_CODE_CAMERA)
+        } else {
+            Toast.makeText(this, "Câmera não disponível", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun criarArquivoImagem(): File {
+        val nomeArquivo = "perfil_${System.currentTimeMillis()}.jpg"
+        val diretorio = File(getExternalFilesDir(Environment.DIRECTORY_PICTURES), "perfil_professor")
+        if (!diretorio.exists()) diretorio.mkdirs()
+        return File(diretorio, nomeArquivo)
+    }
+
+    private fun exibirImagemEEnviar(uri: Uri) {
+        val inputStream = contentResolver.openInputStream(uri)
+        val bitmap = BitmapFactory.decodeStream(inputStream)
+        inputStream?.close()
+
+        val rotatedBitmap = corrigirRotacaoImagem(uri, bitmap)
+        val circularBitmap = getCircularBitmap(rotatedBitmap)
+        imgPerfil.setImageBitmap(circularBitmap)
+
+        // Converte o bitmap circular em um arquivo temporário
+        val file = bitmapToFile(circularBitmap, this)
+
+        MediaManager.get().upload(file.path)
+            .option("folder", "perfil_professor")
+            .callback(object : UploadCallback {
+                override fun onStart(requestId: String) {
+                    Toast.makeText(this@InformacoesActivity, "Fazendo upload da imagem...", Toast.LENGTH_SHORT).show()
+                }
+
+                override fun onSuccess(requestId: String, resultData: Map<*, *>) {
+                    val imageUrl = resultData["secure_url"] as? String
+                    if (!imageUrl.isNullOrEmpty()) {
+                        saveProfileImageUrlToDatabase(imageUrl)
+                        Picasso.get().load(imageUrl).transform(CropCircleTransformation()).into(imgPerfil)
+                    }
+                }
+
+                override fun onError(requestId: String, error: ErrorInfo) {
+                    Toast.makeText(this@InformacoesActivity, "Erro: ${error.description}", Toast.LENGTH_SHORT).show()
+                }
+
+                override fun onProgress(requestId: String, bytes: Long, totalBytes: Long) {}
+                override fun onReschedule(requestId: String, error: ErrorInfo) {}
+            }).dispatch()
     }
 
     private fun saveProfileImageUrlToDatabase(imageUrl: String) {
@@ -221,6 +286,49 @@ class InformacoesActivity : AppCompatActivity() {
         } else {
             Toast.makeText(this, "Usuário não autenticado.", Toast.LENGTH_SHORT).show()
         }
+    }
+    private fun corrigirRotacaoImagem(uri: Uri, bitmap: Bitmap): Bitmap {
+        val input = contentResolver.openInputStream(uri)
+        val exif = input?.let { ExifInterface(it) }
+        val orientacao = exif?.getAttributeInt(
+            ExifInterface.TAG_ORIENTATION,
+            ExifInterface.ORIENTATION_NORMAL
+        ) ?: ExifInterface.ORIENTATION_NORMAL
+
+        val angulo = when (orientacao) {
+            ExifInterface.ORIENTATION_ROTATE_90 -> 90f
+            ExifInterface.ORIENTATION_ROTATE_180 -> 180f
+            ExifInterface.ORIENTATION_ROTATE_270 -> 270f
+            else -> 0f
+        }
+
+        val matrix = Matrix()
+        matrix.postRotate(angulo)
+        return Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true)
+    }
+
+    fun getCircularBitmap(bitmap: Bitmap): Bitmap {
+        val size = minOf(bitmap.width, bitmap.height)
+        val x = (bitmap.width - size) / 2
+        val y = (bitmap.height - size) / 2
+        val squared = Bitmap.createBitmap(bitmap, x, y, size, size)
+        val output = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888)
+        val canvas = Canvas(output)
+        val paint = Paint().apply {
+            isAntiAlias = true
+            shader = BitmapShader(squared, Shader.TileMode.CLAMP, Shader.TileMode.CLAMP)
+        }
+        canvas.drawCircle(size / 2f, size / 2f, size / 2f, paint)
+        squared.recycle()
+        return output
+    }
+    fun bitmapToFile(bitmap: Bitmap, context: Context): File {
+        val file = File(context.cacheDir, "imagem_temp.png")
+        val outputStream = FileOutputStream(file)
+        bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
+        outputStream.flush()
+        outputStream.close()
+        return file
     }
 
     private fun carregarDadosDoAluno() {

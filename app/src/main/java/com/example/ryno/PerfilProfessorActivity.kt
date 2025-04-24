@@ -103,8 +103,6 @@ class PerfilProfessorActivity : AppCompatActivity() {
 
         imgPerfil.isEnabled = false
 
-        imgPerfil = findViewById(R.id.imgPerfil)
-
         imgPerfil.setOnClickListener {
             if (imgPerfil.isEnabled) {
                 escolherFonteImagem()
@@ -151,10 +149,6 @@ class PerfilProfessorActivity : AppCompatActivity() {
                 }
             }
 
-            // Adicionando log para depurar as modalidades
-            Log.d("Modalidades", "Modalidades Selecionadas: ${modalidadesSelecionadas.joinToString(", ")}")
-            Log.d("Modalidades", "Modalidades Escolhidas: $modalidadesEscolhidas")
-
             // Cria o mapa com os dados para salvar no Firestore
             val userMap = mapOf(
                 "nome" to nome,
@@ -168,7 +162,8 @@ class PerfilProfessorActivity : AppCompatActivity() {
             // Verifica se as modalidades estão sendo salvas corretamente
             if (modalidadesEscolhidas.isEmpty()) {
                 Toast.makeText(this, "Por favor, selecione ao menos uma modalidade", Toast.LENGTH_SHORT).show()
-            } else {
+            }
+            else {
                 // Pega o ID do usuário atual
                 val userId = firebaseAuth.currentUser?.uid
                 val firestoreRef = FirebaseFirestore.getInstance().collection("usuarios").document(userId ?: "")
@@ -470,6 +465,7 @@ class PerfilProfessorActivity : AppCompatActivity() {
             Toast.makeText(this, "Usuário não autenticado.", Toast.LENGTH_SHORT).show()
         }
     }
+
     private fun corrigirRotacaoImagem(uri: Uri, bitmap: Bitmap): Bitmap {
         val input = contentResolver.openInputStream(uri)
         val exif = input?.let { ExifInterface(it) }
