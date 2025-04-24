@@ -2,11 +2,11 @@ package com.example.ryno
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
-
 class CadastroAlunoActivity : AppCompatActivity() {
 
     private lateinit var auth: FirebaseAuth
@@ -58,6 +58,13 @@ class CadastroAlunoActivity : AppCompatActivity() {
                             .set(alunoData)
                             .addOnSuccessListener {
                                 Toast.makeText(this, "Conta criada com sucesso!", Toast.LENGTH_SHORT).show()
+
+                                val sharedPrefs = getSharedPreferences("app_prefs", MODE_PRIVATE)
+                                sharedPrefs.edit().putBoolean("isLoggedIn", true).apply()
+                                val userType = "aluno"
+                                // Salva o tipo de usuário no SharedPreferences
+                                sharedPrefs.edit().putString("userType", userType).apply()
+
                                 startActivity(Intent(this, LoginActivity::class.java))
                                 finish()
                             }
@@ -68,6 +75,6 @@ class CadastroAlunoActivity : AppCompatActivity() {
                         Toast.makeText(this, "Erro ao criar usuário: ${task.exception?.message}", Toast.LENGTH_SHORT).show()
                     }
                 }
+            }
         }
     }
-}

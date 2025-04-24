@@ -101,6 +101,13 @@ class CadastroProfessorActivity : AppCompatActivity() {
                             .set(professorData)
                             .addOnSuccessListener {
                                 Toast.makeText(this, "Conta criada com sucesso!", Toast.LENGTH_SHORT).show()
+
+                                val sharedPrefs = getSharedPreferences("app_prefs", MODE_PRIVATE)
+                                sharedPrefs.edit().putBoolean("isLoggedIn", true).apply()
+                                val userType = "professor"
+                                // Salva o tipo de usuário no SharedPreferences
+                                sharedPrefs.edit().putString("userType", userType).apply()
+
                                 startActivity(Intent(this, LoginActivity::class.java)) // adicione aqui o destino
                                 finish()
                             }
