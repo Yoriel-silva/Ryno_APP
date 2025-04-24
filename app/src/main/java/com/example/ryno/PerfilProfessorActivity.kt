@@ -25,7 +25,17 @@ import java.text.Normalizer
 import jp.wasabeef.picasso.transformations.CropCircleTransformation
 import java.io.File
 import android.Manifest
+import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.graphics.BitmapShader
+import android.graphics.Canvas
+import android.graphics.Matrix
+import android.graphics.Paint
+import android.graphics.Shader
+import android.media.ExifInterface
 import android.os.Environment
+import java.io.FileOutputStream
 
 class PerfilProfessorActivity : AppCompatActivity() {
 
@@ -405,8 +415,18 @@ class PerfilProfessorActivity : AppCompatActivity() {
     }
 
     private fun exibirImagemEEnviar(uri: Uri) {
-        Picasso.get().load(uri).transform(CropCircleTransformation()).into(imgPerfil)
-        MediaManager.get().upload(uri)
+        val inputStream = contentResolver.openInputStream(uri)
+        val bitmap = BitmapFactory.decodeStream(inputStream)
+        inputStream?.close()
+
+        val rotatedBitmap = corrigirRotacaoImagem(uri, bitmap)
+        val circularBitmap = getCircularBitmap(rotatedBitmap)
+        imgPerfil.setImageBitmap(circularBitmap)
+
+        // Converte o bitmap circular em um arquivo temporário
+        val file = bitmapToFile(circularBitmap, this)
+
+        MediaManager.get().upload(file.path)
             .option("folder", "perfil_professor")
             .callback(object : UploadCallback {
                 override fun onStart(requestId: String) {
@@ -449,5 +469,48 @@ class PerfilProfessorActivity : AppCompatActivity() {
         } else {
             Toast.makeText(this, "Usuário não autenticado.", Toast.LENGTH_SHORT).show()
         }
+    }
+    private fun corrigirRotacaoImagem(uri: Uri, bitmap: Bitmap): Bitmap {
+        val input = contentResolver.openInputStream(uri)
+        val exif = input?.let { ExifInterface(it) }
+        val orientacao = exif?.getAttributeInt(
+            ExifInterface.TAG_ORIENTATION,
+            ExifInterface.ORIENTATION_NORMAL
+        ) ?: ExifInterface.ORIENTATION_NORMAL
+
+        val angulo = when (orientacao) {
+            ExifInterface.ORIENTATION_ROTATE_90 -> 90f
+            ExifInterface.ORIENTATION_ROTATE_180 -> 180f
+            ExifInterface.ORIENTATION_ROTATE_270 -> 270f
+            else -> 0f
+        }
+
+        val matrix = Matrix()
+        matrix.postRotate(angulo)
+        return Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true)
+    }
+
+    fun getCircularBitmap(bitmap: Bitmap): Bitmap {
+        val size = minOf(bitmap.width, bitmap.height)
+        val x = (bitmap.width - size) / 2
+        val y = (bitmap.height - size) / 2
+        val squared = Bitmap.createBitmap(bitmap, x, y, size, size)
+        val output = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888)
+        val canvas = Canvas(output)
+        val paint = Paint().apply {
+            isAntiAlias = true
+            shader = BitmapShader(squared, Shader.TileMode.CLAMP, Shader.TileMode.CLAMP)
+        }
+        canvas.drawCircle(size / 2f, size / 2f, size / 2f, paint)
+        squared.recycle()
+        return output
+    }
+    fun bitmapToFile(bitmap: Bitmap, context: Context): File {
+        val file = File(context.cacheDir, "imagem_temp.png")
+        val outputStream = FileOutputStream(file)
+        bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
+        outputStream.flush()
+        outputStream.close()
+        return file
     }
 }
