@@ -5,10 +5,15 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
+import android.provider.MediaStore
 import android.util.Log
 import android.view.View
 import android.widget.*
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
+import androidx.core.content.FileProvider
 import com.cloudinary.android.MediaManager
 import com.cloudinary.android.callback.ErrorInfo
 import com.cloudinary.android.callback.UploadCallback
@@ -18,6 +23,9 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.squareup.picasso.Picasso
 import java.text.Normalizer
 import jp.wasabeef.picasso.transformations.CropCircleTransformation
+import java.io.File
+import android.Manifest
+import android.os.Environment
 
 class PerfilProfessorActivity : AppCompatActivity() {
 
@@ -49,8 +57,9 @@ class PerfilProfessorActivity : AppCompatActivity() {
 
     private lateinit var cloudinary: MediaManager
 
-    private lateinit var fusedLocationClient: FusedLocationProviderClient
-    private val REQUEST_CODE_LOCATION = 1001 // Defina um código único para a permissão de localização
+    private val REQUEST_CODE_CAMERA = 101
+    private val REQUEST_CODE_GALLERY = 100
+    private var imageUri: Uri? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -83,15 +92,20 @@ class PerfilProfessorActivity : AppCompatActivity() {
         carregarDadosDoProfessor()
 
         imgPerfil.isEnabled = false
+
+        imgPerfil = findViewById(R.id.imgPerfil)
+
         imgPerfil.setOnClickListener {
             if (imgPerfil.isEnabled) {
-                val intent = Intent(Intent.ACTION_PICK)
-                intent.type = "image/*"
-                startActivityForResult(intent, 100)
+                escolherFonteImagem()
             }
         }
 
         cloudinary = com.cloudinary.android.MediaManager.get()
+
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.CAMERA), 200)
+        }
 
         btnEditar.setOnClickListener {
             // Tornar campos editáveis
@@ -263,6 +277,11 @@ class PerfilProfessorActivity : AppCompatActivity() {
                     Toast.makeText(this, "Permissão necessária para acessar a galeria.", Toast.LENGTH_SHORT).show()
                 }
             }
+            200 -> {
+                if (grantResults.any { it != PackageManager.PERMISSION_GRANTED }) {
+                    Toast.makeText(this, "Permissões necessárias não concedidas", Toast.LENGTH_SHORT).show()
+                }
+            }
         }
     }
 
@@ -274,68 +293,21 @@ class PerfilProfessorActivity : AppCompatActivity() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == 100 && resultCode == Activity.RESULT_OK) {
-            val imageUri: Uri? = data?.data
-            imageUri?.let { uri ->
-                // Exibir a imagem localmente enquanto o upload é feito
-                Picasso.get().load(uri).transform(CropCircleTransformation()).into(imgPerfil)
 
-                // Upload da imagem para o Cloudinary
-                MediaManager.get().upload(uri)
-                    .option("folder", "perfil_professor") // Especificando a pasta no Cloudinary
-                    .callback(object : UploadCallback {
-                        override fun onStart(requestId: String) {
-                            // Mostrar um Toast ou algum tipo de feedback visual
-                            Toast.makeText(this@PerfilProfessorActivity, "Fazendo upload da imagem...", Toast.LENGTH_SHORT).show()
-                        }
-
-                        override fun onProgress(requestId: String, bytes: Long, totalBytes: Long) {
-                            // Aqui você pode mostrar o progresso se quiser
-                        }
-
-                        override fun onSuccess(requestId: String, resultData: Map<*, *>) {
-                            // Recupera o URL da imagem após o upload
-                            val imageUrl = resultData["secure_url"] as? String
-                            if (!imageUrl.isNullOrEmpty()) {
-                                // Salvar a URL da imagem no Firestore
-                                saveProfileImageUrlToDatabase(imageUrl)
-                                // Exibir a imagem no ImageView
-                                Picasso.get().load(imageUrl).transform(CropCircleTransformation()).into(imgPerfil)
-                            }
-                        }
-
-                        override fun onError(requestId: String, error: ErrorInfo) {
-                            // Caso ocorra algum erro no upload
-                            Toast.makeText(this@PerfilProfessorActivity, "Erro ao enviar imagem: ${error.description}", Toast.LENGTH_SHORT).show()
-                        }
-
-                        override fun onReschedule(requestId: String, error: ErrorInfo) {
-                            // Caso seja necessário reagendar o upload (isso pode ser útil em casos de falhas temporárias)
-                        }
-                    })
-                    .dispatch()
+        if (resultCode == Activity.RESULT_OK) {
+            when (requestCode) {
+                REQUEST_CODE_GALLERY -> {
+                    val uri = data?.data
+                    uri?.let {
+                        exibirImagemEEnviar(it)
+                    }
+                }
+                REQUEST_CODE_CAMERA -> {
+                    imageUri?.let {
+                        exibirImagemEEnviar(it)
+                    }
+                }
             }
-        }
-    }
-
-    private fun saveProfileImageUrlToDatabase(imageUrl: String) {
-        // Pega o ID do usuário logado
-        val userId = FirebaseAuth.getInstance().currentUser?.uid
-        if (userId != null) {
-            val firestoreRef = FirebaseFirestore.getInstance().collection("usuarios").document(userId)
-
-            // Atualiza o Firestore com a URL da imagem
-            val userMap = mapOf("profileImageUrl" to imageUrl)
-
-            firestoreRef.update(userMap)
-                .addOnSuccessListener {
-                    Toast.makeText(this, "Imagem de perfil atualizada!", Toast.LENGTH_SHORT).show()
-                }
-                .addOnFailureListener {
-                    Toast.makeText(this, "Erro ao salvar imagem de perfil", Toast.LENGTH_SHORT).show()
-                }
-        } else {
-            Toast.makeText(this, "Usuário não autenticado.", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -397,6 +369,85 @@ class PerfilProfessorActivity : AppCompatActivity() {
             }.addOnFailureListener {
                 Toast.makeText(this, "Erro ao carregar dados do perfil", Toast.LENGTH_SHORT).show()
             }
+        }
+    }
+
+    private fun escolherFonteImagem() {
+        val opcoes = arrayOf("Câmera", "Galeria")
+        val builder = AlertDialog.Builder(this)
+        builder.setTitle("Escolher imagem de perfil")
+        builder.setItems(opcoes) { _, which ->
+            when (which) {
+                0 -> abrirCamera()
+                1 -> openGallery()
+            }
+        }
+        builder.show()
+    }
+
+    private fun abrirCamera() {
+        val cameraIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+        if (cameraIntent.resolveActivity(packageManager) != null) {
+            val photoFile = criarArquivoImagem()
+            imageUri = FileProvider.getUriForFile(this, "${packageName}.provider", photoFile)
+            cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri)
+            startActivityForResult(cameraIntent, REQUEST_CODE_CAMERA)
+        } else {
+            Toast.makeText(this, "Câmera não disponível", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun criarArquivoImagem(): File {
+        val nomeArquivo = "perfil_${System.currentTimeMillis()}.jpg"
+        val diretorio = File(getExternalFilesDir(Environment.DIRECTORY_PICTURES), "perfil_professor")
+        if (!diretorio.exists()) diretorio.mkdirs()
+        return File(diretorio, nomeArquivo)
+    }
+
+    private fun exibirImagemEEnviar(uri: Uri) {
+        Picasso.get().load(uri).transform(CropCircleTransformation()).into(imgPerfil)
+        MediaManager.get().upload(uri)
+            .option("folder", "perfil_professor")
+            .callback(object : UploadCallback {
+                override fun onStart(requestId: String) {
+                    Toast.makeText(this@PerfilProfessorActivity, "Fazendo upload da imagem...", Toast.LENGTH_SHORT).show()
+                }
+
+                override fun onSuccess(requestId: String, resultData: Map<*, *>) {
+                    val imageUrl = resultData["secure_url"] as? String
+                    if (!imageUrl.isNullOrEmpty()) {
+                        saveProfileImageUrlToDatabase(imageUrl)
+                        Picasso.get().load(imageUrl).transform(CropCircleTransformation()).into(imgPerfil)
+                    }
+                }
+
+                override fun onError(requestId: String, error: ErrorInfo) {
+                    Toast.makeText(this@PerfilProfessorActivity, "Erro: ${error.description}", Toast.LENGTH_SHORT).show()
+                }
+
+                override fun onProgress(requestId: String, bytes: Long, totalBytes: Long) {}
+                override fun onReschedule(requestId: String, error: ErrorInfo) {}
+            }).dispatch()
+    }
+
+    private fun saveProfileImageUrlToDatabase(imageUrl: String) {
+        // Pega o ID do usuário logado
+        val userId = FirebaseAuth.getInstance().currentUser?.uid
+        if (userId != null) {
+            val firestoreRef = FirebaseFirestore.getInstance().collection("usuarios").document(userId)
+
+            // Atualiza o Firestore com a URL da imagem
+            val userMap = mapOf("profileImageUrl" to imageUrl)
+
+            firestoreRef.update(userMap)
+                .addOnSuccessListener {
+                    Toast.makeText(this, "Imagem de perfil atualizada!", Toast.LENGTH_SHORT).show()
+                }
+                .addOnFailureListener {
+                    Toast.makeText(this, "Erro ao salvar imagem de perfil", Toast.LENGTH_SHORT).show()
+                }
+        } else {
+            Toast.makeText(this, "Usuário não autenticado.", Toast.LENGTH_SHORT).show()
         }
     }
 }
