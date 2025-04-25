@@ -1,16 +1,27 @@
 package com.example.ryno
 
+import android.Manifest
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.location.Location
 import android.os.Bundle
 import android.util.Log
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+
 class CadastroAlunoActivity : AppCompatActivity() {
 
     private lateinit var auth: FirebaseAuth
     private lateinit var db: FirebaseFirestore
+
+    private lateinit var fusedLocationClient: FusedLocationProviderClient
+    private val REQUEST_CODE_LOCATION = 1001 // Defina um código único para
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -65,6 +76,15 @@ class CadastroAlunoActivity : AppCompatActivity() {
                                 // Salva o tipo de usuário no SharedPreferences
                                 sharedPrefs.edit().putString("userType", userType).apply()
 
+                                fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+
+                                // Verificar permissão de localização
+                                if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                                    ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), REQUEST_CODE_LOCATION)
+                                } else {
+                                    obterLocalizacao() // Caso já tenha permissão, obter a localização imediatamente
+                                }
+
                                 startActivity(Intent(this, LoginActivity::class.java))
                                 finish()
                             }
@@ -77,4 +97,59 @@ class CadastroAlunoActivity : AppCompatActivity() {
                 }
             }
         }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+
+        when (requestCode) {
+            1001 -> { // Permissão para acessar a localização
+                if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    obterLocalizacao()
+                } else {
+                    Toast.makeText(this, "Permissão de localização necessária", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
     }
+
+    fun obterLocalizacao() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+            != PackageManager.PERMISSION_GRANTED
+        ) {
+            // Permissão não foi concedida, então não tenta acessar a localização
+            Toast.makeText(this, "Permissão de localização não concedida.", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        fusedLocationClient.lastLocation.addOnSuccessListener { location: Location? ->
+            if (location != null) {
+                salvarLocalizacaoNoFirestore(location.latitude, location.longitude)
+            } else {
+                Toast.makeText(this, "Não foi possível obter a localização", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    fun salvarLocalizacaoNoFirestore(latitude: Double, longitude: Double) {
+        val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
+
+        val db = FirebaseFirestore.getInstance()
+
+        val localizacao = hashMapOf(
+            "latitude" to latitude,
+            "longitude" to longitude
+        ) as Map<String, Any>
+
+        if (userId != null) {
+            db.collection("usuarios").document(userId)
+                .update("localizacao", localizacao)
+                .addOnSuccessListener {
+                    Log.d("localização", "Localização salva com sucesso!")
+                }
+                .addOnFailureListener {
+                    Log.e("localização", "Erro ao salvar localização", it)
+                }
+        }
+    }
+}
+
