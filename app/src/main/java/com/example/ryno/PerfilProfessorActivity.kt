@@ -36,6 +36,8 @@ import android.graphics.Shader
 import android.media.ExifInterface
 import android.os.Environment
 import java.io.FileOutputStream
+import org.xmlpull.v1.XmlPullParser
+import android.util.Xml
 
 class PerfilProfessorActivity : AppCompatActivity() {
 
@@ -58,10 +60,7 @@ class PerfilProfessorActivity : AppCompatActivity() {
 
     private lateinit var edtCidade: AutoCompleteTextView
 
-    private val cidades = listOf(
-        "São Paulo", "Salvador", "Fortaleza", "Belo Horizonte",
-        "Rio de Janeiro", "Curitiba", "Brasília", "Manaus", "Recife", "Porto Alegre"
-    )
+    private lateinit var cidades: List<String>
 
     private lateinit var firebaseAuth: FirebaseAuth
 
@@ -94,6 +93,8 @@ class PerfilProfessorActivity : AppCompatActivity() {
         edtModalidades.setOnClickListener {
             abrirDialogModalidades()
         }
+
+        val cidades = carregarCidadesDoXml()
 
         edtCidade = findViewById(R.id.edtCidade)
         val adapter = CidadeAdapter(this, cidades)
@@ -508,5 +509,39 @@ class PerfilProfessorActivity : AppCompatActivity() {
         outputStream.flush()
         outputStream.close()
         return file
+    }
+
+    private fun carregarCidadesDoXml(): List<String> {
+        val cidades = mutableListOf<String>()
+        val parser = Xml.newPullParser()
+        val inputStream = resources.openRawResource(R.raw.cidades)
+        parser.setInput(inputStream, null)
+
+        var eventType = parser.eventType
+        var dentroDeCidade = false
+        var nomeCidade = ""
+
+        while (eventType != XmlPullParser.END_DOCUMENT) {
+            val tagName = parser.name
+            when (eventType) {
+                XmlPullParser.START_TAG -> {
+                    if (tagName.equals("CIDADE", ignoreCase = true)) {
+                        dentroDeCidade = true
+                    } else if (dentroDeCidade && tagName.equals("NOME", ignoreCase = true)) {
+                        nomeCidade = parser.nextText()
+                    }
+                }
+                XmlPullParser.END_TAG -> {
+                    if (tagName.equals("CIDADE", ignoreCase = true)) {
+                        if (nomeCidade.isNotBlank()) cidades.add(nomeCidade)
+                        nomeCidade = ""
+                        dentroDeCidade = false
+                    }
+                }
+            }
+            eventType = parser.next()
+        }
+
+        return cidades
     }
 }
