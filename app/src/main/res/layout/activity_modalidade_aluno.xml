@@ -1,90 +1,114 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#000000">
 
-
-
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        android:id="@+id/layoutFiltro"
+    <TextView
+        android:id="@+id/txtTitulo"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:padding="16dp"
-        android:orientation="vertical">
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/concert_one"
+        android:layout_marginTop="20dp"
+        android:text="Modalidades"
+        android:textColor="#8900DD"
+        android:textSize="30sp"
+        android:textStyle="normal"
+        android:textAlignment="center"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
-        <TextView
+    <ScrollView
+        android:id="@+id/scrollViewCheckboxes"
+        android:layout_width="match_parent"
+        android:layout_height="400dp"
+        app:layout_constraintTop_toBottomOf="@id/txtTitulo"
+        app:layout_constraintBottom_toTopOf="@id/txtFiltrarDistancia"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <LinearLayout
+            android:id="@+id/containerCheckboxesFiltro"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:fontFamily="@font/concert_one"
-            android:layout_marginTop="20dp"
-            android:text="Modalidades"
-            android:textColor="#8900DD"
-            android:textSize="30sp"
-            android:textStyle="normal"
-            android:textAlignment="center"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.497"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            android:orientation="vertical"
+            android:padding="16dp" />
+    </ScrollView>
 
-        <ScrollView
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1">
+    <TextView
+        android:id="@+id/txtFiltrarDistancia"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/concert_one"
+        android:text="Filtar Distância"
+        android:textColor="#8900DD"
+        android:textSize="30sp"
+        android:layout_marginTop="20dp"
+        app:layout_constraintTop_toBottomOf="@id/scrollViewCheckboxes"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
-            <LinearLayout
-                android:id="@+id/containerCheckboxesFiltro"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical" />
-        </ScrollView>
+    <SeekBar
+        android:id="@+id/seekBarDistancia"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_margin="20dp"
+        android:max="1000"
+        android:progress="1"
+        android:layout_marginBottom="8dp"
+        app:layout_constraintTop_toBottomOf="@id/txtFiltrarDistancia"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
-    </LinearLayout>
+    <TextView
+        android:id="@+id/txtDistanciaValor"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/concert_one"
+        android:text="Distância máxima: 1km"
+        android:textColor="#8900DD"
+        android:textSize="22sp"
+        android:layout_marginTop="20dp"
+        app:layout_constraintTop_toBottomOf="@id/seekBarDistancia"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
+    <!-- Bottom Navigation -->
     <LinearLayout
-        android:layout_width="match_parent"
+        android:id="@+id/bottomNav"
+        android:layout_width="0dp"
         android:layout_height="60dp"
         android:orientation="horizontal"
-        android:background="#ffff"
+        android:background="#ffffff"
+        android:paddingHorizontal="30dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
 
         <Button
             android:id="@+id/btnFalso1"
             android:drawableStart="@drawable/ic_modalidades"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_marginTop="5dp"
-            android:layout_marginBottom="5dp"
-            android:layout_marginRight="30dp"
-            android:layout_marginLeft="30dp"
             android:layout_weight="1" />
 
         <Button
             android:id="@+id/btnAplicarFiltros"
             android:drawableStart="@drawable/ic_ryno"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:layout_marginTop="5dp"
-            android:layout_marginBottom="5dp"
-            android:layout_marginRight="30dp"
-            android:layout_marginLeft="30dp" />
+            android:layout_weight="1" />
 
         <Button
             android:id="@+id/btnPerfil"
             android:drawableStart="@drawable/ic_perfil"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_marginTop="5dp"
-            android:layout_marginBottom="5dp"
-            android:layout_marginRight="30dp"
-            android:layout_marginLeft="30dp"
             android:layout_weight="1" />
-
     </LinearLayout>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

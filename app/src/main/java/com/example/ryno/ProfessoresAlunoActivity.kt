@@ -92,31 +92,33 @@ class ProfessoresAlunoActivity : AppCompatActivity() {
     private fun filtrarProfessoresPorModalidades() {
         val userId = FirebaseAuth.getInstance().currentUser?.uid ?: "default"
         val sharedPref = getSharedPreferences("filtro_prefs_$userId", MODE_PRIVATE)
+
+        // Recupera modalidades e distância salvos
         val selecionadas = sharedPref.getStringSet("modalidadesSelecionadas", emptySet())?.toList() ?: emptyList()
-        if (selecionadas.isEmpty()) {
-            Log.d("filtro", "Nenhuma modalidade selecionada. Exibindo lista completa.")
-            adapter.atualizarLista(listaCompleta)
+        val distanciaMaxima = sharedPref.getFloat("distanciaSelecionada", 1000f).toDouble()
+
+        Log.d("filtro", "Modalidades selecionadas: $selecionadas")
+        Log.d("filtro", "Distância máxima aplicada: $distanciaMaxima km")
+
+        val filtrados = if (selecionadas.isEmpty()) {
+            // Nenhuma modalidade selecionada: aplica apenas o filtro de distância
+            listaCompleta.filter { professor ->
+                val estaDentroDistancia = (professor.distanciaKm ?: Double.MAX_VALUE) <= distanciaMaxima
+                estaDentroDistancia
+            }
         } else {
-            Log.d("filtro", "Selecionadas: $selecionadas")
-            listaCompleta.forEach {
-                Log.d("filtro", "${it.nome} => ${it.modalidades}")
+            // Modalidades selecionadas: aplica ambos os filtros
+            listaCompleta.filter { professor ->
+                val temModalidade = selecionadas.all { it.trim() in professor.modalidades.map { m -> m.trim() } }
+                val estaDentroDistancia = (professor.distanciaKm ?: Double.MAX_VALUE) <= distanciaMaxima
+                temModalidade && estaDentroDistancia
             }
-            val filtrados = listaCompleta.filter { professor ->
-                Log.d("filtro", "Professor: ${professor.nome}")
-                selecionadas.forEach { selecionada ->
-                    val passou = professor.modalidades.any { it.trim() == selecionada.trim() }
-                    Log.d("filtro", " - Modalidade '$selecionada' encontrada em ${professor.modalidades}? $passou")
-                }
-
-                val resultado = selecionadas.all { it.trim() in professor.modalidades.map { m -> m.trim() } }
-                Log.d("filtro", "Professor ${professor.nome} passou? $resultado")
-                resultado
-            }
-
-            Log.d("filtro", "Professores filtrados: ${filtrados.map { it.nome }}")
-            adapter.atualizarLista(filtrados)
         }
+
+        Log.d("filtro", "Professores filtrados: ${filtrados.map { it.nome }}")
+        adapter.atualizarLista(filtrados)
     }
+
 
     private fun salvarProfessorVisualizado(professor: Professor) {
         val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
@@ -188,11 +190,7 @@ class ProfessoresAlunoActivity : AppCompatActivity() {
     }
 
     private fun carregarProfessores() {
-        // Verifica se a localização do aluno foi carregada antes de buscar os professores
-        Log.e("Localizacao", "latitude carregada2: ${latitudeAluno}", )
-        Log.e("Localizacao", "longitude carregada2: ${longitudeAluno}")
         if (latitudeAluno != null && longitudeAluno != null) {
-            Log.e("Localizacao", "Entrou 2")
             FirebaseFirestore.getInstance()
                 .collection("usuarios")
                 .whereEqualTo("tipo", "professor")
@@ -201,7 +199,6 @@ class ProfessoresAlunoActivity : AppCompatActivity() {
                     listaCompleta.clear()
                     for (document in result) {
                         val professor = document.toObject(Professor::class.java)
-                        Log.d(TAG, "Professor carregado: ${professor.nome}, modalidades: ${professor.modalidades}")
                         listaCompleta.add(professor)
                     }
 
@@ -211,38 +208,23 @@ class ProfessoresAlunoActivity : AppCompatActivity() {
                         if (latProf != null && lonProf != null && latitudeAluno != null && longitudeAluno != null) {
                             val distancia = calcularDistancia(latitudeAluno!!, longitudeAluno!!, latProf, lonProf)
                             professor.distanciaKm = distancia
+                            Log.d("distancia", "Professor ${professor.nome}: lat=$latProf, lon=$lonProf, distância=${professor.distanciaKm}")
                         } else {
                             professor.distanciaKm = Double.MAX_VALUE
                         }
                     }
 
-                    // Agora ordena
+                    // Agora que a distância foi calculada para cada professor, filtra por modalidades e distância
                     listaCompleta.sortBy { it.distanciaKm }
                     filtrarProfessoresPorModalidades()
-
-//                    Ordenar por distância
-//                    listaCompleta.sortBy { professor ->
-//                        val latProf = professor.localizacao["latitude"]
-//                        val lonProf = professor.localizacao["longitude"]
-//                        if (latProf != null && lonProf != null && latitudeAluno != null && longitudeAluno != null) {
-//                            calcularDistancia(latitudeAluno!!, longitudeAluno!!, latProf, lonProf)
-//                        } else {
-//                            Double.MAX_VALUE // Sem localização => manda pro final da lista
-//                        }
-//                    }
-
-                    //adapter.atualizarLista(listaCompleta)
                 }
                 .addOnFailureListener {
                     Log.e(TAG, "Erro ao carregar professores", it)
                     Toast.makeText(this, "Erro ao carregar professores", Toast.LENGTH_SHORT).show()
                 }
         } else {
-            // Caso a localização ainda não tenha sido carregada
             Toast.makeText(this, "Carregando localização do aluno...", Toast.LENGTH_SHORT).show()
-            Log.e("Localizacao", "latitude: ${latitudeAluno}", )
-            Log.e("Localizacao", "longitude: ${longitudeAluno}", )
-
         }
     }
+
 }

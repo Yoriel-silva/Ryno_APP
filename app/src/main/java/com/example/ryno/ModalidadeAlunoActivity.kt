@@ -9,6 +9,7 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.auth.FirebaseAuth
+import android.widget.SeekBar
 
 class ModalidadeAlunoActivity : AppCompatActivity() {
     private val modalidades = arrayOf("Futebol", "Basquete", "Vôlei", "Natação")
@@ -25,6 +26,31 @@ class ModalidadeAlunoActivity : AppCompatActivity() {
         val userId = FirebaseAuth.getInstance().currentUser?.uid ?: "default"
         val sharedPref = getSharedPreferences("filtro_prefs_$userId", MODE_PRIVATE)
         val preSelecionadas = sharedPref.getStringSet("modalidadesSelecionadas", emptySet()) ?: emptySet()
+
+        val txtDistancia = findViewById<TextView>(R.id.txtDistanciaValor)
+        val txtDistanciaValor = findViewById<TextView>(R.id.txtDistanciaValor)
+
+        val seekBar = findViewById<SeekBar>(R.id.seekBarDistancia)
+
+        var valorSelecionado = seekBar.progress.toFloat() // valor em km
+
+        // Pega valor salvo anteriormente
+        val distanciaSalva = sharedPref.getFloat("distanciaSelecionada", 10f) // default = 10km
+        seekBar.progress = distanciaSalva.toInt()
+        txtDistanciaValor.text = "Distância máxima: $distanciaSalva km"
+
+        txtDistancia.text = "Distância máxima: ${seekBar.progress} km"
+
+        seekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+                val distancia = progress.toFloat()
+                txtDistancia.text = "Distância máxima: ${distancia.toInt()} km" // Atualiza o valor da distância
+            }
+
+            override fun onStartTrackingTouch(seekBar: SeekBar?) {}
+
+            override fun onStopTrackingTouch(seekBar: SeekBar?) {}
+        })
 
         modalidades.forEach { modalidade ->
             val inflater = layoutInflater
@@ -62,7 +88,10 @@ class ModalidadeAlunoActivity : AppCompatActivity() {
 
             val userId = FirebaseAuth.getInstance().currentUser?.uid ?: "default"
             val sharedPref = getSharedPreferences("filtro_prefs_$userId", MODE_PRIVATE)
-            sharedPref.edit().putStringSet("modalidadesSelecionadas", selecionadas.toSet()).apply()
+            sharedPref.edit()
+                .putStringSet("modalidadesSelecionadas", selecionadas.toSet())
+                .putFloat("distanciaSelecionada", seekBar.progress.toFloat())
+                .apply()
 
             val intent = Intent(this, ProfessoresAlunoActivity::class.java)
             startActivity(intent)
@@ -76,7 +105,10 @@ class ModalidadeAlunoActivity : AppCompatActivity() {
 
             val userId = FirebaseAuth.getInstance().currentUser?.uid ?: "default"
             val sharedPref = getSharedPreferences("filtro_prefs_$userId", MODE_PRIVATE)
-            sharedPref.edit().putStringSet("modalidadesSelecionadas", selecionadas.toSet()).apply()
+            sharedPref.edit()
+                .putStringSet("modalidadesSelecionadas", selecionadas.toSet())
+                .putFloat("distanciaSelecionada", seekBar.progress.toFloat())
+                .apply()
 
             val intent = Intent(this, PerfilAlunoActivity::class.java)
             startActivity(intent)
