@@ -32,7 +32,7 @@ class ModalidadeAlunoActivity : AppCompatActivity() {
 
         val seekBar = findViewById<SeekBar>(R.id.seekBarDistancia)
 
-        var valorSelecionado = seekBar.progress.toFloat()
+        var valorSelecionado = seekBar.progress.toFloat() //
 
         // Pega valor salvo anteriormente
         val distanciaSalva = sharedPref.getFloat("distanciaSelecionada", 10f) // default = 10km
