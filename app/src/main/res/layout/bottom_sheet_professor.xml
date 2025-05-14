@@ -6,13 +6,25 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <ImageView
-        android:id="@+id/imgFoto"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
-        android:layout_gravity="center"
-        android:scaleType="centerCrop"
-        android:src="@drawable/ic_default_avatar" />
+    <FrameLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center">
+
+        <ImageView
+            android:id="@+id/imgFoto"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:scaleType="fitCenter"
+            android:background="@drawable/circular_white_background"
+            android:src="@drawable/ic_default_avatar" />
+        <ImageView
+            android:id="@+id/imgBorda"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:scaleType="fitCenter"
+            android:background="@drawable/circular_border" />
+    </FrameLayout>
 
     <TextView android:id="@+id/txtNome"
         style="@style/TextAppearance.AppCompat.Large"

@@ -30,7 +30,7 @@
         android:layout_marginTop="32dp"
         android:background="@drawable/circular_white_background"
         android:contentDescription="Imagem de perfil"
-        android:scaleType="centerCrop"
+        android:scaleType="fitCenter"
         android:src="@drawable/ic_default_avatar"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.49"

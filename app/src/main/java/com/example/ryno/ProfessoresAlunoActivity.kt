@@ -71,18 +71,6 @@ class ProfessoresAlunoActivity : AppCompatActivity() {
         }
     }
 
-//    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-//        super.onActivityResult(requestCode, resultCode, data)
-//
-//        if (requestCode == REQUEST_CODE_FILTRO && resultCode == Activity.RESULT_OK) {
-//            val selecionadas = data?.getStringArrayListExtra("modalidadesSelecionadas") ?: return
-//            Log.d("filtro", "Modalidades selecionadas no filtro: $selecionadas")
-//            ultimasSelecionadas = selecionadas
-//            filtrarProfessoresPorModalidades(selecionadas)
-//        }
-//        Log.d("filtro", "Chamou mais não validou.")
-//    }
-
     override fun onResume() {
         super.onResume()
         carregarLocalizacaoAluno {

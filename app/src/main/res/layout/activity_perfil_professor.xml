@@ -34,8 +34,8 @@
         android:layout_marginTop="32dp"
         android:background="@drawable/circular_white_background"
         android:contentDescription="Imagem de perfil"
-        android:scaleType="centerCrop"
         android:src="@drawable/ic_default_avatar"
+        android:scaleType="fitCenter"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.49"
         app:layout_constraintStart_toStartOf="parent"
@@ -57,7 +57,6 @@
 
     <ImageView
         android:id="@+id/imgEditar"
-
         android:layout_width="70dp"
         android:layout_height="70dp"
         android:layout_gravity="center"
