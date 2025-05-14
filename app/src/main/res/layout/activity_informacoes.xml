@@ -110,6 +110,7 @@
         android:background="@drawable/edittext_background"
         android:fontFamily="@font/concert_one"
         android:inputType="text"
+        android:maxLength="11"
         android:padding="12dp"
         android:enabled="false"
         android:text="11111-1111"

@@ -107,38 +107,80 @@ class InformacoesActivity : AppCompatActivity() {
             val email = edtEmail.text.toString()
             val telefone = edtTelefone.text.toString()
 
-            // Cria o mapa com os dados para salvar no Firestore
-            val userMap = mapOf(
-                "nome" to nome,
-                "email" to email,
-                "telefone" to telefone,
-            )
+            if (nome.isEmpty() || email.isEmpty() || telefone.isEmpty()) {
+                Toast.makeText(this, "Preencha todos os campos", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
 
-                // Pega o ID do usuário atual
+            if (!nome.matches(Regex("^[A-Za-zÀ-ÿ\\s]+\$"))) {
+                Toast.makeText(this, "O nome não deve conter números ou símbolos", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            if (!email.matches(Regex("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$"))) {
+                Toast.makeText(this, "Insira um e-mail valido", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            if (!telefone.matches(Regex("^\\d{11}$"))) {
+                Toast.makeText(this, "Telefone deve conter 11 dígitos numéricos", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
             val userId = firebaseAuth.currentUser?.uid
-            val firestoreRef = FirebaseFirestore.getInstance().collection("usuarios").document(userId ?: "")
+            val db = FirebaseFirestore.getInstance()
 
-                // Atualiza os dados do usuário no Firestore
-            firestoreRef.update(userMap)
-                .addOnSuccessListener {
-                    Toast.makeText(this, "Dados salvos com sucesso!", Toast.LENGTH_SHORT).show()
+            db.collection("usuarios").whereNotEqualTo("uid", userId).get().addOnSuccessListener { documents ->
+                var duplicado = false
+
+                for (document in documents) {
+                    if (document.getString("telefone") == telefone) {
+                        Toast.makeText(
+                            this,
+                            "Telefone já cadastrado por outro usuário",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        duplicado = true
+                        break
+                    }
+                    if (document.getString("email") == email) {
+                        Toast.makeText(
+                            this,
+                            "E-mail já cadastrado por outro usuário",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        duplicado = true
+                        break
+                    }
                 }
-                .addOnFailureListener {
-                    Toast.makeText(this, "Erro ao salvar dados", Toast.LENGTH_SHORT).show()
-                }
 
-            // Depois de salvar, voltar para o modo não editável
-            edtNome.isEnabled = false
-            edtEmail.isEnabled = false
-            edtTelefone.isEnabled = false
+                if (duplicado) return@addOnSuccessListener
 
-            imgPerfil.isEnabled = false
+                val userMap = mapOf(
+                    "nome" to nome,
+                    "email" to email,
+                    "telefone" to telefone,
+                )
 
-            imgEditar.visibility = View.INVISIBLE
+                db.collection("usuarios").document(userId ?: "").update(userMap)
+                    .addOnSuccessListener {
+                        Toast.makeText(this, "Dados salvos com sucesso!", Toast.LENGTH_SHORT).show()
 
-            // Troca os botões novamente
-            btnSalvar.visibility = Button.INVISIBLE
-            btnEditar.visibility = Button.VISIBLE
+                        // Só aqui você troca os campos e botões
+                        edtNome.isEnabled = false
+                        edtEmail.isEnabled = false
+                        edtTelefone.isEnabled = false
+
+                        imgPerfil.isEnabled = false
+                        imgEditar.visibility = View.INVISIBLE
+                        btnSalvar.visibility = Button.INVISIBLE
+                        btnEditar.visibility = Button.VISIBLE
+                    }
+                    .addOnFailureListener {
+                        Toast.makeText(this, "Erro ao salvar dados", Toast.LENGTH_SHORT).show()
+                    }
+
+            }
         }
 
         btnDeslogar.setOnClickListener {
