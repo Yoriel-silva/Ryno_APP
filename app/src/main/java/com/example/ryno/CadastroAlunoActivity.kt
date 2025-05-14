@@ -7,6 +7,7 @@ import android.location.Location
 import android.os.Bundle
 import android.util.Log
 import android.widget.*
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -35,6 +36,28 @@ class CadastroAlunoActivity : AppCompatActivity() {
         val emailEditText = findViewById<EditText>(R.id.EmailAluno)
         val telefoneEditText = findViewById<EditText>(R.id.TelefoneAluno)
         val senhaEditText = findViewById<EditText>(R.id.SenhaAluno)
+
+        val termosTextView: TextView = findViewById(R.id.Termos)
+
+        termosTextView.setOnClickListener {
+            // Criando o Dialog personalizado
+            val dialogView = layoutInflater.inflate(R.layout.dialog_termos, null)
+
+            // Criando o AlertDialog
+            val dialog = AlertDialog.Builder(this)
+                .setView(dialogView)
+                .create()
+
+            // Configurando o botão de fechar
+            val closeButton: Button = dialogView.findViewById(R.id.btn_close)
+            closeButton.setOnClickListener {
+                dialog.dismiss() // Fechar o pop-up
+            }
+
+            // Exibir o Dialog
+            dialog.show()
+        }
+
         val checkBox = findViewById<CheckBox>(R.id.checkBox)
         val botaoCriar = findViewById<Button>(R.id.Btn_CriarAluno)
 
