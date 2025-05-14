@@ -41,22 +41,6 @@
             app:layout_constraintTop_toBottomOf="@+id/logo_ryno" />
 
         <EditText
-            android:id="@+id/EmailAluno"
-            android:layout_width="280dp"
-            android:layout_height="45dp"
-            android:layout_marginTop="24dp"
-            android:background="@drawable/edittext_background"
-            android:fontFamily="@font/concert_one"
-            android:hint="Email"
-            android:inputType="textEmailAddress"
-            android:padding="12dp"
-            android:textColor="#8900DD"
-            android:textColorHint="#8900DD"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/NomeAluno" />
-
-        <EditText
             android:id="@+id/TelefoneAluno"
             android:layout_width="280dp"
             android:layout_height="45dp"
@@ -71,23 +55,8 @@
             android:textColorHint="#8900DD"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/EmailAluno" />
+            app:layout_constraintTop_toBottomOf="@id/NomeAluno" />
 
-        <EditText
-            android:id="@+id/SenhaAluno"
-            android:layout_width="280dp"
-            android:layout_height="45dp"
-            android:layout_marginTop="24dp"
-            android:background="@drawable/edittext_background"
-            android:fontFamily="@font/concert_one"
-            android:hint="Senha"
-            android:inputType="textPassword"
-            android:padding="12dp"
-            android:textColor="#8900DD"
-            android:textColorHint="#8900DD"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/TelefoneAluno" />
 
         <CheckBox
             android:id="@+id/checkBox"
@@ -100,7 +69,7 @@
             android:text="Li e concordo com os"
             android:textColor="#FFFFFF"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/SenhaAluno" />
+            app:layout_constraintTop_toBottomOf="@id/TelefoneAluno"/>
 
         <TextView
             android:id="@+id/Termos"

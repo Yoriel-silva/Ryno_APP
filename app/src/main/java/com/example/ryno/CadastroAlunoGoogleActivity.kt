@@ -33,9 +33,7 @@ class CadastroAlunoGoogleActivity : AppCompatActivity() {
         db = FirebaseFirestore.getInstance()
 
         val nomeEditText = findViewById<EditText>(R.id.NomeAluno)
-        val emailEditText = findViewById<EditText>(R.id.EmailAluno)
         val telefoneEditText = findViewById<EditText>(R.id.TelefoneAluno)
-        val senhaEditText = findViewById<EditText>(R.id.SenhaAluno)
 
         val termosTextView: TextView = findViewById(R.id.Termos)
 
@@ -63,11 +61,9 @@ class CadastroAlunoGoogleActivity : AppCompatActivity() {
 
         botaoCriar.setOnClickListener {
             val nome = nomeEditText.text.toString().trim()
-            val email = emailEditText.text.toString().trim()
             val telefone = telefoneEditText.text.toString().trim()
-            val senha = senhaEditText.text.toString().trim()
 
-            if (nome.isEmpty() || email.isEmpty() || telefone.isEmpty() || senha.isEmpty()) {
+            if (nome.isEmpty() || telefone.isEmpty()) {
                 Toast.makeText(this, "Preencha todos os campos", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
@@ -87,73 +83,51 @@ class CadastroAlunoGoogleActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-            db.collection("usuarios")
-                .whereEqualTo("telefone", telefone)
-                .get()
-                .addOnSuccessListener { documents ->
+            db.collection("usuarios").whereEqualTo("telefone", telefone).get().addOnSuccessListener { documents ->
                     if (!documents.isEmpty) {
                         Toast.makeText(this, "Telefone já cadastrado", Toast.LENGTH_SHORT).show()
                         return@addOnSuccessListener
                     }
 
-                    // Só cria o usuário se o telefone ainda não estiver cadastrado
-                    auth.createUserWithEmailAndPassword(email, senha)
-                        .addOnCompleteListener { task ->
-                            if (task.isSuccessful) {
-                                val userId = auth.currentUser?.uid ?: ""
-                                val alunoData = hashMapOf(
-                                    "uid" to userId,
-                                    "nome" to nome,
-                                    "email" to email,
-                                    "telefone" to telefone,
-                                    "tipo" to "aluno"
-                                )
+                // Só cria o usuário se o telefone ainda não estiver cadastrado
+                val userId = auth.currentUser?.uid ?: ""
+                val user = FirebaseAuth.getInstance().currentUser
+                val email = user?.email
+                val alunoData = hashMapOf(
+                    "uid" to userId,
+                    "nome" to nome,
+                    "email" to email,
+                    "telefone" to telefone,
+                    "tipo" to "aluno"
+                )
 
-                                db.collection("usuarios").document(userId)
-                                    .set(alunoData)
-                                    .addOnSuccessListener {
-                                        Toast.makeText(this, "Conta criada com sucesso!", Toast.LENGTH_SHORT).show()
+                db.collection("usuarios").document(userId)
+                    .set(alunoData)
+                    .addOnSuccessListener {
+                        Toast.makeText(this, "Conta criada com sucesso!", Toast.LENGTH_SHORT).show()
 
-                                        val sharedPrefs = getSharedPreferences("app_prefs", MODE_PRIVATE)
-                                        sharedPrefs.edit().putBoolean("isLoggedIn", true).apply()
-                                        sharedPrefs.edit().putString("userType", "aluno").apply()
+                        val sharedPrefs = getSharedPreferences("app_prefs", MODE_PRIVATE)
+                        sharedPrefs.edit().putBoolean("isLoggedIn", true).apply()
+                        sharedPrefs.edit().putString("userType", "aluno").apply()
 
-                                        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+                        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
 
-                                        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
-                                            != PackageManager.PERMISSION_GRANTED
-                                        ) {
-                                            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), REQUEST_CODE_LOCATION)
-                                        } else {
-                                            obterLocalizacao()
-                                        }
-
-                                        startActivity(Intent(this, LoginActivity::class.java))
-                                        finish()
-                                    }
-                                    .addOnFailureListener {
-                                        Toast.makeText(this, "Erro ao salvar dados: ${it.message}", Toast.LENGTH_SHORT).show()
-                                    }
-                            }
-                            else {
-                                val exception = task.exception
-                                val errorMessage = when (exception) {
-                                    is FirebaseAuthException -> when (exception.errorCode) {
-                                        "ERROR_INVALID_EMAIL" -> "Por favor, insira um e-mail válido."
-                                        "ERROR_EMAIL_ALREADY_IN_USE" -> "Este e-mail já está em uso."
-                                        "ERROR_WEAK_PASSWORD" -> "A senha deve ter pelo menos 6 caracteres."
-                                        else -> "Erro: ${exception.message}"
-                                    }
-                                    else -> "Erro desconhecido: ${exception?.message}"
-                                }
-
-                                Toast.makeText(this, errorMessage, Toast.LENGTH_SHORT).show()
-                            }
+                        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                            != PackageManager.PERMISSION_GRANTED
+                            ) {
+                            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), REQUEST_CODE_LOCATION)
+                        } else {
+                            obterLocalizacao()
                         }
 
-                }.addOnFailureListener {
-                    Toast.makeText(this, "Erro ao verificar telefone: ${it.message}", Toast.LENGTH_SHORT).show()
-                }
+                        startActivity(Intent(this, LoginActivity::class.java))
+                        finish()
+                    }.addOnFailureListener {
+                        Toast.makeText(this, "Erro ao salvar dados: ${it.message}", Toast.LENGTH_SHORT).show()
+                    }
+            }.addOnFailureListener {
+                Toast.makeText(this, "Erro ao verificar Telefone: ${it.message}", Toast.LENGTH_SHORT).show()
+            }
         }
     }
 
