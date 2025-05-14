@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:background="@drawable/dialog_background">
+
+    <!-- Título do Pop-up -->
+    <TextView
+        android:id="@+id/dialog_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Termos de Uso"
+        android:textSize="18sp"
+        android:textColor="#000000"
+        android:textStyle="bold"
+        android:layout_marginBottom="8dp" />
+
+    <!-- Texto dos Termos -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="200dp">
+
+        <TextView
+            android:id="@+id/dialog_termos_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Aqui estão os termos de uso..."
+            android:textColor="#000000"
+            android:textSize="14sp" />
+    </ScrollView>
+
+    <!-- Botão para Fechar o Pop-up -->
+    <Button
+        android:id="@+id/btn_close"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Fechar"
+        android:layout_gravity="center" />
+</LinearLayout>

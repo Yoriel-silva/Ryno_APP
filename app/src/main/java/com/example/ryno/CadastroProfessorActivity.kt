@@ -17,6 +17,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import java.text.Normalizer
 import org.xmlpull.v1.XmlPullParser
 import android.util.Xml
+import androidx.appcompat.app.AlertDialog
 import com.google.firebase.auth.FirebaseAuthException
 
 class CadastroProfessorActivity : AppCompatActivity() {
@@ -41,7 +42,30 @@ class CadastroProfessorActivity : AppCompatActivity() {
         val telefone = findViewById<EditText>(R.id.TelefoneProfessor)
         val senha = findViewById<EditText>(R.id.SenhaProfessor)
         val cref = findViewById<EditText>(R.id.CREF)
+
+        val termosTextView: TextView = findViewById(R.id.Termos)
+
+        termosTextView.setOnClickListener {
+            // Criando o Dialog personalizado
+            val dialogView = layoutInflater.inflate(R.layout.dialog_termos, null)
+
+            // Criando o AlertDialog
+            val dialog = AlertDialog.Builder(this)
+                .setView(dialogView)
+                .create()
+
+            // Configurando o botão de fechar
+            val closeButton: Button = dialogView.findViewById(R.id.btn_close)
+            closeButton.setOnClickListener {
+                dialog.dismiss() // Fechar o pop-up
+            }
+
+            // Exibir o Dialog
+            dialog.show()
+        }
+
         val checkbox = findViewById<CheckBox>(R.id.checkBox)
+
         val botaoCriar = findViewById<Button>(R.id.Btn_CriarProfessor)
 
         val tvModalidades = findViewById<TextView>(R.id.modalidadeSelecionada)
