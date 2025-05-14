@@ -150,57 +150,122 @@ class PerfilProfessorActivity : AppCompatActivity() {
                 }
             }
 
-            // Cria o mapa com os dados para salvar no Firestore
-            val userMap = mapOf(
-                "nome" to nome,
-                "email" to email,
-                "telefone" to telefone,
-                "cref" to cref,
-                "cidade" to cidade,
-                "modalidades" to modalidadesEscolhidas  // Salva as modalidades escolhidas
-            )
-
-            // Verifica se as modalidades estão sendo salvas corretamente
-            if (modalidadesEscolhidas.isEmpty()) {
-                Toast.makeText(this, "Por favor, selecione ao menos uma modalidade", Toast.LENGTH_SHORT).show()
+            if (nome.isEmpty() || email.isEmpty() || telefone.isEmpty() || cref.isEmpty()) {
+                Toast.makeText(this, "Preencha todos os campos", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
             }
-            else {
-                // Pega o ID do usuário atual
-                val userId = firebaseAuth.currentUser?.uid
-                val firestoreRef = FirebaseFirestore.getInstance().collection("usuarios").document(userId ?: "")
 
-                // Atualiza os dados do usuário no Firestore
-                firestoreRef.update(userMap)
+            if (!nome.matches(Regex("^[A-Za-zÀ-ÿ\\s]+\$"))) {
+                Toast.makeText(this, "O nome não deve conter números ou símbolos", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            if (!email.matches(Regex("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$"))) {
+                Toast.makeText(this, "Insira um e-mail valido", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            if (!telefone.matches(Regex("^\\d{11}$"))) {
+                Toast.makeText(this, "Telefone deve conter 11 dígitos numéricos", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            if (!cref.matches(Regex("^\\d{6,11}$"))) {
+                Toast.makeText(this, "CREF deve conter entre 6 e 11 dígitos numéricos", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            if (modalidadesEscolhidas.isEmpty()) {
+                Toast.makeText(this, "Selecione ao menos uma modalidade", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            if (cidade.isEmpty()) {
+                Toast.makeText(this, "Selecione uma cidade", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            if (!cidades.contains(cidade)) {
+                Toast.makeText(this, "Cidade inválida. Escolha uma da lista.", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            val userId = firebaseAuth.currentUser?.uid
+            val db = FirebaseFirestore.getInstance()
+
+            db.collection("usuarios").whereNotEqualTo("uid", userId).get().addOnSuccessListener { documents ->
+                var duplicado = false
+
+                for (document in documents) {
+                    if (document.getString("cref") == cref) {
+                        Toast.makeText(
+                            this,
+                            "CREF já cadastrado por outro usuário",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        duplicado = true
+                        break
+                    }
+                    if (document.getString("telefone") == telefone) {
+                        Toast.makeText(
+                            this,
+                            "Telefone já cadastrado por outro usuário",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        duplicado = true
+                        break
+                    }
+                    if (document.getString("email") == email) {
+                        Toast.makeText(
+                            this,
+                            "E-mail já cadastrado por outro usuário",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        duplicado = true
+                        break
+                    }
+                }
+
+                if (duplicado) return@addOnSuccessListener
+
+                val userMap = mapOf(
+                    "nome" to nome,
+                    "email" to email,
+                    "telefone" to telefone,
+                    "cref" to cref,
+                    "cidade" to cidade,
+                    "modalidades" to modalidadesEscolhidas
+                )
+
+                db.collection("usuarios").document(userId ?: "").update(userMap)
                     .addOnSuccessListener {
                         Toast.makeText(this, "Dados salvos com sucesso!", Toast.LENGTH_SHORT).show()
+
+                        // Só aqui você troca os campos e botões
+                        edtNome.isEnabled = false
+                        edtEmail.isEnabled = false
+                        edtTelefone.isEnabled = false
+                        edtCref.isEnabled = false
+                        edtCidade.isEnabled = false
+                        edtModalidades.isEnabled = false
+
+                        imgPerfil.isEnabled = false
+                        imgEditar.visibility = View.INVISIBLE
+                        btnSalvar.visibility = Button.INVISIBLE
+                        btnEditar.visibility = Button.VISIBLE
                     }
                     .addOnFailureListener {
                         Toast.makeText(this, "Erro ao salvar dados", Toast.LENGTH_SHORT).show()
                     }
+
             }
-
-            // Depois de salvar, voltar para o modo não editável
-            edtNome.isEnabled = false
-            edtEmail.isEnabled = false
-            edtTelefone.isEnabled = false
-            edtCref.isEnabled = false
-            edtCidade.isEnabled = false
-            edtModalidades.isEnabled = false
-
-            imgPerfil.isEnabled = false
-
-            imgEditar.visibility = View.INVISIBLE
-
-            // Troca os botões novamente
-            btnSalvar.visibility = Button.INVISIBLE
-            btnEditar.visibility = Button.VISIBLE
-        }
 
         btnDeslogar.setOnClickListener {
             firebaseAuth.signOut()
             startActivity(Intent(this, LoginActivity::class.java))
             finish()
         }
+    }
     }
 
     private fun abrirDialogModalidades() {
