@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#000000"
+    android:fillViewport="true">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="24dp">
+
+        <ImageView
+            android:id="@+id/logo_ryno"
+            android:layout_width="120dp"
+            android:layout_height="120dp"
+            android:layout_marginTop="76dp"
+            android:contentDescription="Logo do Ryno"
+            android:src="@drawable/logo_ryno"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.497"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <EditText
+            android:id="@+id/NomeAluno"
+            android:layout_width="280dp"
+            android:layout_height="45dp"
+            android:layout_marginTop="48dp"
+            android:background="@drawable/edittext_background"
+            android:fontFamily="@font/concert_one"
+            android:hint="Nome"
+            android:inputType="textPersonName"
+            android:padding="12dp"
+            android:textColor="#8900DD"
+            android:textColorHint="#8900DD"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/logo_ryno" />
+
+        <EditText
+            android:id="@+id/EmailAluno"
+            android:layout_width="280dp"
+            android:layout_height="45dp"
+            android:layout_marginTop="24dp"
+            android:background="@drawable/edittext_background"
+            android:fontFamily="@font/concert_one"
+            android:hint="Email"
+            android:inputType="textEmailAddress"
+            android:padding="12dp"
+            android:textColor="#8900DD"
+            android:textColorHint="#8900DD"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/NomeAluno" />
+
+        <EditText
+            android:id="@+id/TelefoneAluno"
+            android:layout_width="280dp"
+            android:layout_height="45dp"
+            android:layout_marginTop="24dp"
+            android:background="@drawable/edittext_background"
+            android:fontFamily="@font/concert_one"
+            android:hint="Telefone"
+            android:inputType="phone"
+            android:maxLength="11"
+            android:padding="12dp"
+            android:textColor="#8900DD"
+            android:textColorHint="#8900DD"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/EmailAluno" />
+
+        <EditText
+            android:id="@+id/SenhaAluno"
+            android:layout_width="280dp"
+            android:layout_height="45dp"
+            android:layout_marginTop="24dp"
+            android:background="@drawable/edittext_background"
+            android:fontFamily="@font/concert_one"
+            android:hint="Senha"
+            android:inputType="textPassword"
+            android:padding="12dp"
+            android:textColor="#8900DD"
+            android:textColorHint="#8900DD"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/TelefoneAluno" />
+
+        <CheckBox
+            android:id="@+id/checkBox"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="40dp"
+            android:layout_marginTop="16dp"
+            android:buttonTint="#673AB7"
+            android:fontFamily="@font/concert_one"
+            android:text="Li e concordo com os"
+            android:textColor="#FFFFFF"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/SenhaAluno" />
+
+        <TextView
+            android:id="@+id/Termos"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/concert_one"
+            android:text="termos e condições"
+            android:textColor="#8900DD"
+            app:layout_constraintBaseline_toBaselineOf="@id/checkBox"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.16"
+            app:layout_constraintStart_toEndOf="@+id/checkBox" />
+
+        <Button
+            android:id="@+id/Btn_CriarAluno"
+            android:layout_width="130dp"
+            android:layout_height="48dp"
+            android:layout_marginTop="28dp"
+            android:background="@drawable/rounded_button"
+            android:fontFamily="@font/concert_one"
+            android:padding="12dp"
+            android:text="Criar"
+            android:textAlignment="center"
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/checkBox" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>
