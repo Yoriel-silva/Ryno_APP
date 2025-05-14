@@ -58,30 +58,41 @@
             app:layout_constraintTop_toBottomOf="@id/NomeAluno" />
 
 
-        <CheckBox
-            android:id="@+id/checkBox"
+        <LinearLayout
+            android:id="@+id/termosLayout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="40dp"
-            android:layout_marginTop="16dp"
-            android:buttonTint="#673AB7"
-            android:fontFamily="@font/concert_one"
-            android:text="Li e concordo com os"
-            android:textColor="#FFFFFF"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/TelefoneAluno"/>
-
-        <TextView
-            android:id="@+id/Termos"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:fontFamily="@font/concert_one"
-            android:text="termos e condições"
-            android:textColor="#8900DD"
-            app:layout_constraintBaseline_toBaselineOf="@id/checkBox"
+            android:layout_marginTop="24dp"
+            android:orientation="horizontal"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.16"
-            app:layout_constraintStart_toEndOf="@+id/checkBox" />
+            app:layout_constraintHorizontal_bias="0.48"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/TelefoneAluno">
+
+            <CheckBox
+                android:id="@+id/checkBox"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:buttonTint="#673AB7"
+                android:fontFamily="@font/concert_one"
+                android:text="Li e concordo com os "
+                android:textColor="#FFFFFF"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/TelefoneAluno" />
+
+            <TextView
+                android:id="@+id/Termos"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/concert_one"
+                android:text="termos e condições"
+                android:textColor="#8900DD"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.17"
+                app:layout_constraintStart_toEndOf="@+id/checkBox"
+                app:layout_constraintTop_toBottomOf="@+id/TelefoneAluno" />
+        </LinearLayout>
 
         <Button
             android:id="@+id/Btn_CriarAluno"
@@ -97,7 +108,7 @@
             android:textSize="16sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/checkBox" />
+            app:layout_constraintTop_toBottomOf="@id/termosLayout" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>

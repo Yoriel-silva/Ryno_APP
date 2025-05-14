@@ -79,24 +79,6 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/EmailProfessor" />
 
-        <!-- SENHA -->
-        <EditText
-            android:id="@+id/SenhaProfessor"
-            android:layout_width="280dp"
-            android:layout_height="45dp"
-            android:layout_marginTop="16dp"
-            android:background="@drawable/edittext_background"
-            android:fontFamily="@font/concert_one"
-            android:hint="Senha"
-            android:inputType="textPassword"
-            android:padding="12dp"
-            android:textColor="#8900DD"
-            android:textColorHint="#8900DD"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.503"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/TelefoneProfessor" />
-
         <!-- CREF -->
         <EditText
             android:id="@+id/CREF"
@@ -114,7 +96,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.503"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/SenhaProfessor" />
+            app:layout_constraintTop_toBottomOf="@id/TelefoneProfessor" />
 
         <TextView
             android:id="@+id/modalidadeSelecionada"
@@ -152,30 +134,68 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/modalidadeSelecionada" />
 
-        <CheckBox
-            android:id="@+id/checkBox"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="48dp"
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/SenhaProfessorBox"
+            android:layout_width="280dp"
+            android:layout_height="55dp"
             android:layout_marginTop="16dp"
-            android:buttonTint="#673AB7"
-            android:fontFamily="@font/concert_one"
-            android:text="Li e concordo com os"
-            android:textColor="#FFFFFF"
+            app:passwordToggleEnabled="true"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/autoCidade" />
+            android:textColorHint="#8900DD"
+            app:layout_constraintTop_toBottomOf="@id/autoCidade">
 
-        <TextView
-            android:id="@+id/Termos"
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/SenhaProfessor"
+                android:layout_width="280dp"
+                android:layout_height="45dp"
+                android:layout_marginTop="24dp"
+                android:background="@drawable/edittext_background"
+                android:fontFamily="@font/concert_one"
+                android:hint="Senha"
+                android:inputType="textPassword"
+                android:padding="12dp"
+                android:textColor="#8900DD"
+                android:textColorHint="#8900DD"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <LinearLayout
+            android:id="@+id/termosLayout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:fontFamily="@font/concert_one"
-            android:text="@string/termos"
-            android:textColor="#8900DD"
-            app:layout_constraintBaseline_toBaselineOf="@id/checkBox"
+            android:layout_marginTop="24dp"
+            android:orientation="horizontal"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.16"
-            app:layout_constraintStart_toEndOf="@+id/checkBox" />
+            app:layout_constraintHorizontal_bias="0.48"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/SenhaProfessorBox">
+
+            <CheckBox
+                android:id="@+id/checkBox"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:buttonTint="#673AB7"
+                android:fontFamily="@font/concert_one"
+                android:text="Li e concordo com os "
+                android:textColor="#FFFFFF"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/SenhaProfessor" />
+
+            <TextView
+                android:id="@+id/Termos"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/concert_one"
+                android:text="termos e condições"
+                android:textColor="#8900DD"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.17"
+                app:layout_constraintStart_toEndOf="@+id/checkBox"
+                app:layout_constraintTop_toBottomOf="@+id/SenhaAluno" />
+        </LinearLayout>
 
         <Button
             android:id="@+id/Btn_CriarProfessor"
@@ -190,7 +210,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.48"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/checkBox" />
+            app:layout_constraintTop_toBottomOf="@+id/termosLayout" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.core.widget.NestedScrollView>
