@@ -95,8 +95,8 @@ class CadastroProfessorActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-            if (telefoneTxt.length != 11) {
-                Toast.makeText(this, "Telefone deve conter 11 dígitos", Toast.LENGTH_SHORT).show()
+            if (!telefoneTxt.matches(Regex("^\\d{11}$"))) {
+                Toast.makeText(this, "Telefone deve conter 11 dígitos numéricos", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
