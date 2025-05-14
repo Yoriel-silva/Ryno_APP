@@ -54,7 +54,7 @@ class PerfilProfessorActivity : AppCompatActivity() {
 
     private lateinit var edtModalidades: TextView
 
-    private val modalidades = arrayOf("Futebol", "Basquete", "Vôlei", "Natação")
+    private val modalidades = arrayOf("Musculação", "Lutas", "Natação", "Yoga")
     private val modalidadesSelecionadas = BooleanArray(modalidades.size)
     private val modalidadesEscolhidas = mutableListOf<String>()
 
@@ -418,7 +418,7 @@ class PerfilProfessorActivity : AppCompatActivity() {
                         edtModalidades.setText(modalidadesStr)
 
                         // Preenche a variável global `modalidadesSelecionadas` corretamente
-                        val modalidadesArray = arrayOf("Futebol", "Basquete", "Vôlei", "Natação")
+                        val modalidadesArray = arrayOf("Musculação", "Lutas", "Natação", "Yoga")
 
                         // Atualizando diretamente a variável global `modalidadesSelecionadas`
                         for (i in modalidadesArray.indices) {

@@ -73,7 +73,7 @@ class CadastroProfessorActivity : AppCompatActivity() {
         val botaoCriar = findViewById<Button>(R.id.Btn_CriarProfessor)
 
         val tvModalidades = findViewById<TextView>(R.id.modalidadeSelecionada)
-        val modalidades = arrayOf("Futebol", "Basquete", "Vôlei", "Natação")
+        val modalidades = arrayOf("Musculação", "Lutas", "Natação", "Yoga")
         val modalidadesSelecionadas = BooleanArray(modalidades.size)
         val modalidadesEscolhidas = mutableListOf<String>()
 

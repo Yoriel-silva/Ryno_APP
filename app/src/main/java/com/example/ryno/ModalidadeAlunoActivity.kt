@@ -13,7 +13,7 @@ import com.google.firebase.auth.FirebaseAuth
 import android.widget.SeekBar
 
 class ModalidadeAlunoActivity : AppCompatActivity() {
-    private val modalidades = arrayOf("Futebol", "Basquete", "Vôlei", "Natação")
+    private val modalidades = arrayOf("Musculação", "Lutas", "Natação", "Yoga")
     private val checkBoxList = mutableListOf<CheckBox>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -69,10 +69,10 @@ class ModalidadeAlunoActivity : AppCompatActivity() {
             checkBox.isChecked = preSelecionadas.contains(modalidade)
 
             val iconeResId = when (modalidade) {
-                "Futebol" -> R.drawable.ic_perfil
-                "Basquete" -> R.drawable.ic_ryno
-                "Vôlei" -> R.drawable.ic_modalidades
-                "Natação" -> R.drawable.ic_perfil
+                "Musculação" -> R.drawable.ic_musculacao
+                "Lutas" -> R.drawable.ic_lutas
+                "Natação" -> R.drawable.ic_natacao
+                "Yoga" -> R.drawable.ic_yoga
                 else -> R.drawable.ic_ryno
             }
 
