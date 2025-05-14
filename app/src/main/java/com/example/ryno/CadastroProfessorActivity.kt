@@ -17,6 +17,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import java.text.Normalizer
 import org.xmlpull.v1.XmlPullParser
 import android.util.Xml
+import com.google.firebase.auth.FirebaseAuthException
 
 class CadastroProfessorActivity : AppCompatActivity() {
 
@@ -89,29 +90,69 @@ class CadastroProfessorActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
+            if (!nomeTxt.matches(Regex("^[A-Za-zÀ-ÿ\\s]+\$"))) {
+                Toast.makeText(this, "O nome não deve conter números ou símbolos", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            if (telefoneTxt.length != 11) {
+                Toast.makeText(this, "Telefone deve conter 11 dígitos", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            if (!crefTxt.matches(Regex("^\\d{6,11}$"))) {
+                Toast.makeText(this, "CREF deve conter entre 6 e 11 dígitos numéricos", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            if (modalidadesEscolhidas.isEmpty()) {
+                Toast.makeText(this, "Selecione ao menos uma modalidade", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            if (cidade.isEmpty()) {
+                Toast.makeText(this, "Selecione uma cidade", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            if (!cidades.contains(cidade)) {
+                Toast.makeText(this, "Cidade inválida. Escolha uma da lista.", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
             if (!checkbox.isChecked) {
                 Toast.makeText(this, "Você deve aceitar os termos.", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
-            auth.createUserWithEmailAndPassword(emailTxt, senhaTxt)
-                .addOnCompleteListener { task ->
-                    if (task.isSuccessful) {
-                        val userId = auth.currentUser?.uid ?: ""
-                        val professorData = hashMapOf(
-                            "uid" to userId,
-                            "nome" to nomeTxt,
-                            "email" to emailTxt,
-                            "telefone" to telefoneTxt,
-                            "cref" to crefTxt,
-                            "cidade" to cidade,
-                            "modalidades" to modalidadesEscolhidas,
-                            "tipo" to "professor"
-                        )
+            db.collection("usuarios").whereEqualTo("cref", crefTxt).get().addOnSuccessListener { crefDocs ->
+                if (!crefDocs.isEmpty) {
+                    Toast.makeText(this, "CREF já cadastrado", Toast.LENGTH_SHORT).show()
+                    return@addOnSuccessListener
+                }
 
-                        db.collection("usuarios").document(userId)
-                            .set(professorData)
-                            .addOnSuccessListener {
+                db.collection("usuarios").whereEqualTo("telefone", telefoneTxt).get().addOnSuccessListener { telDocs ->
+                    if (!telDocs.isEmpty) {
+                        Toast.makeText(this, "Telefone já cadastrado", Toast.LENGTH_SHORT).show()
+                        return@addOnSuccessListener
+                    }
+
+                    // Criar usuário normalmente
+                    auth.createUserWithEmailAndPassword(emailTxt, senhaTxt).addOnCompleteListener { task ->
+                        if (task.isSuccessful) {
+                            val userId = auth.currentUser?.uid ?: ""
+                            val professorData = hashMapOf(
+                                "uid" to userId,
+                                "nome" to nomeTxt,
+                                "email" to emailTxt,
+                                "telefone" to telefoneTxt,
+                                "cref" to crefTxt,
+                                "cidade" to cidade,
+                                "modalidades" to modalidadesEscolhidas,
+                                "tipo" to "professor"
+                            )
+
+                            db.collection("usuarios").document(userId).set(professorData).addOnSuccessListener {
                                 Toast.makeText(this, "Conta criada com sucesso!", Toast.LENGTH_SHORT).show()
 
                                 val sharedPrefs = getSharedPreferences("app_prefs", MODE_PRIVATE)
@@ -125,21 +166,39 @@ class CadastroProfessorActivity : AppCompatActivity() {
                                 // Verificar permissão de localização
                                 if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                                     ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), REQUEST_CODE_LOCATION)
-                                } else {
+                                }
+                                else {
                                     obterLocalizacao() // Caso já tenha permissão, obter a localização imediatamente
                                 }
 
                                 startActivity(Intent(this, LoginActivity::class.java)) // adicione aqui o destino
                                 finish()
-                            }
-                            .addOnFailureListener {
+
+                            }.addOnFailureListener{
                                 Toast.makeText(this, "Erro ao salvar dados: ${it.message}", Toast.LENGTH_SHORT).show()
                             }
-                    } else {
-                        Toast.makeText(this, "Erro ao criar usuário: ${task.exception?.message}", Toast.LENGTH_SHORT).show()
-                        Log.e("Auth", "Erro ao criar usuário", task.exception)
+                        }
+                        else {
+                            val exception = task.exception
+                            val errorMessage = when (exception) {
+                                is FirebaseAuthException -> when (exception.errorCode) {
+                                    "ERROR_INVALID_EMAIL" -> "Por favor, insira um e-mail válido."
+                                    "ERROR_EMAIL_ALREADY_IN_USE" -> "Este e-mail já está em uso."
+                                    "ERROR_WEAK_PASSWORD" -> "A senha deve ter pelo menos 6 caracteres."
+                                    else -> "Erro: ${exception.message}"
+                                }
+                                else -> "Erro desconhecido: ${exception?.message}"
+                            }
+
+                            Toast.makeText(this, errorMessage, Toast.LENGTH_SHORT).show()
+                        }
                     }
+                }.addOnFailureListener {
+                    Toast.makeText(this, "Erro ao verificar telefone: ${it.message}", Toast.LENGTH_SHORT).show()
                 }
+            }.addOnFailureListener {
+                Toast.makeText(this, "Erro ao verificar Cref: ${it.message}", Toast.LENGTH_SHORT).show()
+            }
         }
     }
 

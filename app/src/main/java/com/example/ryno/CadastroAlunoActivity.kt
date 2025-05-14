@@ -128,8 +128,7 @@ class CadastroAlunoActivity : AppCompatActivity() {
                             }
                         }
 
-                }
-                .addOnFailureListener {
+                }.addOnFailureListener {
                     Toast.makeText(this, "Erro ao verificar telefone: ${it.message}", Toast.LENGTH_SHORT).show()
                 }
         }
