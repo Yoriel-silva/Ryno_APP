@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">Ryno</string>
     <string name="termos">termos e condições</string>
+    <string name="default_web_client_id">325586453317-r26n5jiug4okt87o4h7o5at0ci1o32g2.apps.googleusercontent.com</string>
 </resources>

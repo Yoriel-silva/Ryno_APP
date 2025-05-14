@@ -12,7 +12,20 @@
           "package_name": "com.example.ryno"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "325586453317-cuft4i15cbt32o6oic7s9laricp1g9c9.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.ryno",
+            "certificate_hash": "87cecc69f7dbd83a3684e32991e3a0224e98a940"
+          }
+        },
+        {
+          "client_id": "325586453317-r26n5jiug4okt87o4h7o5at0ci1o32g2.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyCJ8s5fnGQbGudfaQ7hMeHZ7AI7Rk63kkY"
@@ -20,7 +33,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "325586453317-r26n5jiug4okt87o4h7o5at0ci1o32g2.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }

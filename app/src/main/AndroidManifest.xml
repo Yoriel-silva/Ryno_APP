@@ -44,6 +44,12 @@
 
         <activity android:name=".RedefinirSenhaActivity" />
 
+        <activity android:name=".TipoCadastroGoogleActivity" />
+
+        <activity android:name=".CadastroAlunoGoogleActivity" />
+
+        <activity android:name=".CadastroProfessorGoogleActivity" />
+
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="com.example.ryno.provider"

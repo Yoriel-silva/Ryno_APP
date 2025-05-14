@@ -20,9 +20,14 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInClient
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.android.gms.common.SignInButton
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.firestore.FirebaseFirestore
 
 class LoginActivity : AppCompatActivity() {
@@ -32,6 +37,9 @@ class LoginActivity : AppCompatActivity() {
 
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private val REQUEST_CODE_LOCATION = 1001 // Defina um código único para a permissão de localização
+
+    private lateinit var googleSignInClient: GoogleSignInClient
+    private val RC_SIGN_IN = 1
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -118,6 +126,19 @@ class LoginActivity : AppCompatActivity() {
             startActivity(intent)
                 finish()
         }
+
+        val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+            .requestIdToken(getString(R.string.default_web_client_id)) // do strings.xml
+            .requestEmail()
+            .build()
+
+        googleSignInClient = GoogleSignIn.getClient(this, gso)
+
+        findViewById<Button>(R.id.buttonGoogle).setOnClickListener {
+            val signInIntent = googleSignInClient.signInIntent
+            startActivityForResult(signInIntent, RC_SIGN_IN)
+        }
+
     }
 
     private fun loginUser(email: String, password: String) {
@@ -215,6 +236,73 @@ class LoginActivity : AppCompatActivity() {
                 .addOnFailureListener {
                     Log.e("localização", "Erro ao salvar localização", it)
                 }
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        if (requestCode == RC_SIGN_IN) {
+            val task = GoogleSignIn.getSignedInAccountFromIntent(data)
+            if (task.isSuccessful) {
+                val account = task.result
+                val credential = GoogleAuthProvider.getCredential(account.idToken, null)
+
+                auth.signInWithCredential(credential).addOnCompleteListener { authTask ->
+                    if (authTask.isSuccessful) {
+                        checkUsuarioCadastrado()
+                    } else {
+                        Toast.makeText(this, "Falha no login", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            } else {
+                Toast.makeText(this, "Falha ao obter conta Google", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    private fun checkUsuarioCadastrado() {
+        val uid = auth.currentUser?.uid ?: return
+
+        firestore.collection("usuarios").document(uid).get().addOnSuccessListener { doc ->
+            if (doc.exists()) {
+                // Usuário já tem cadastro -> Direcionar para tela principal
+                val user = auth.currentUser
+                val sharedPrefs = getSharedPreferences("app_prefs", MODE_PRIVATE)
+
+                // Definindo a preferência de login
+                sharedPrefs.edit().putBoolean("isLoggedIn", true).apply()
+
+                // Agora vamos pegar o tipo de usuário do Firestore
+                val userId = user?.uid
+                if (userId != null) {
+                    // Consulta ao Firestore para pegar o tipo de usuário (campo 'tipo')
+                    firestore.collection("usuarios").document(userId)
+                        .get().addOnSuccessListener { document ->
+                            if (document.exists()) {
+                                val userType = document.getString("tipo") // Pega o campo 'tipo'
+
+                                // Salva o tipo de usuário no SharedPreferences
+                                sharedPrefs.edit().putString("userType", userType).apply()
+
+                                // Redireciona para a página correspondente
+                                when (userType) {
+                                    "aluno" -> startActivity(Intent(this, ProfessoresAlunoActivity::class.java))
+                                    "professor" -> startActivity(Intent(this, PerfilProfessorActivity::class.java))
+                                }
+                                finish()
+                            } else {
+                                Toast.makeText(this, "Usuário não encontrado no Firestore.", Toast.LENGTH_SHORT).show()
+                            }
+                        }
+                        .addOnFailureListener { exception ->
+                            Toast.makeText(this, "Erro ao obter o tipo de usuário: ${exception.message}", Toast.LENGTH_SHORT).show()
+                        }
+                }
+            } else {
+                // Usuário novo -> Direcionar para escolha entre aluno ou professor
+                startActivity(Intent(this, TipoCadastroGoogleActivity::class.java))
+            }
         }
     }
 }
