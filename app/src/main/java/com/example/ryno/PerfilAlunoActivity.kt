@@ -3,6 +3,7 @@ package com.example.ryno
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
+import android.widget.ImageButton
 import androidx.appcompat.app.AppCompatActivity
 
 class PerfilAlunoActivity : AppCompatActivity() {
@@ -14,8 +15,8 @@ class PerfilAlunoActivity : AppCompatActivity() {
         val buttonHistorico = findViewById<Button>(R.id.btnHistorico)
         val buttonInformações = findViewById<Button>(R.id.btnInformacoes)
 
-        val buttonModalidade = findViewById<Button>(R.id.btnModalidades)
-        val buttonProfessores = findViewById<Button>(R.id.btnProfessores)
+        val buttonModalidade = findViewById<ImageButton>(R.id.btnModalidades)
+        val buttonProfessores = findViewById<ImageButton>(R.id.btnProfessores)
 
         buttonHistorico.setOnClickListener {
             val intent = Intent(this, HistoricoActivity::class.java)

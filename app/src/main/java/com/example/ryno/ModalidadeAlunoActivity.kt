@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
 import android.widget.CheckBox
+import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -20,8 +21,8 @@ class ModalidadeAlunoActivity : AppCompatActivity() {
         setContentView(R.layout.activity_modalidade_aluno)
 
         val containerCheckboxes = findViewById<LinearLayout>(R.id.containerCheckboxesFiltro)
-        val btnAplicar = findViewById<Button>(R.id.btnAplicarFiltros)
-        val btnPerfil = findViewById<Button>(R.id.btnPerfil)
+        val btnAplicar = findViewById<ImageButton>(R.id.btnAplicarFiltros)
+        val btnPerfil = findViewById<ImageButton>(R.id.btnPerfil)
 
         val userId = FirebaseAuth.getInstance().currentUser?.uid ?: "default"
         val sharedPref = getSharedPreferences("filtro_prefs_$userId", MODE_PRIVATE)

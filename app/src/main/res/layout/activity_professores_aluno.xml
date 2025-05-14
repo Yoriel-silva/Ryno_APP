@@ -37,46 +37,54 @@
     </LinearLayout>
 
     <LinearLayout
+        android:id="@+id/bottomNav"
         android:layout_width="match_parent"
         android:layout_height="60dp"
         android:orientation="horizontal"
-        android:background="#ffff"
+        android:background="#ffffff"
+        android:paddingHorizontal="20dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
 
-        <Button
+        <ImageButton
             android:id="@+id/btnAbrirFiltros"
-            android:drawableStart="@drawable/ic_modalidades"
+            android:src="@drawable/ic_modalidades"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_marginTop="5dp"
             android:layout_marginBottom="5dp"
             android:layout_marginRight="30dp"
             android:layout_marginLeft="30dp"
-            android:layout_weight="1" />
-
-        <Button
-            android:id="@+id/btnFalso1"
-            android:drawableStart="@drawable/ic_ryno"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
             android:layout_weight="1"
-            android:layout_marginTop="5dp"
-            android:layout_marginBottom="5dp"
-            android:layout_marginRight="30dp"
-            android:layout_marginLeft="30dp" />
+            android:background="@drawable/btn_white_ripple"
+            android:elevation="0dp"/>
 
-        <Button
-            android:id="@+id/btnPerfil"
-            android:drawableStart="@drawable/ic_perfil"
+        <ImageButton
+            android:id="@+id/btnFalso1"
+            android:src="@drawable/ic_ryno"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_marginTop="5dp"
             android:layout_marginBottom="5dp"
             android:layout_marginRight="30dp"
             android:layout_marginLeft="30dp"
-            android:layout_weight="1" />
+            android:layout_weight="1"
+            android:background="@drawable/btn_white_ripple"
+            android:elevation="0dp"/>
+
+        <ImageButton
+            android:id="@+id/btnPerfil"
+            android:src="@drawable/ic_perfil"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="5dp"
+            android:layout_marginRight="30dp"
+            android:layout_marginLeft="30dp"
+            android:layout_weight="1"
+            android:background="@drawable/btn_white_ripple"
+            android:elevation="0dp"/>
 
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

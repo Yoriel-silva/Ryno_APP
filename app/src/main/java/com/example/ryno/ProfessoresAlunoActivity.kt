@@ -5,6 +5,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.widget.Button
+import android.widget.ImageButton
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -38,8 +39,8 @@ class ProfessoresAlunoActivity : AppCompatActivity() {
         firebaseAuth = FirebaseAuth.getInstance()
 
         recyclerView = findViewById(R.id.recyclerProfessores)
-        val btnAbrirFiltros = findViewById<Button>(R.id.btnAbrirFiltros)
-        val btnPerfil = findViewById<Button>(R.id.btnPerfil)
+        val btnAbrirFiltros = findViewById<ImageButton>(R.id.btnAbrirFiltros)
+        val btnPerfil = findViewById<ImageButton>(R.id.btnPerfil)
 
         adapter = ProfessorAdapter(
             lista = emptyList(),
