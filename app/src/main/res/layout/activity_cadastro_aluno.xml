@@ -65,6 +65,7 @@
             android:fontFamily="@font/concert_one"
             android:hint="Telefone"
             android:inputType="phone"
+            android:maxLength="11"
             android:padding="12dp"
             android:textColor="#8900DD"
             android:textColorHint="#8900DD"

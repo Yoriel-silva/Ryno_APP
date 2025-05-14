@@ -14,6 +14,7 @@ import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.auth.FirebaseAuthException
 
 class CadastroAlunoActivity : AppCompatActivity() {
 
@@ -48,55 +49,91 @@ class CadastroAlunoActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
+            if (!nome.matches(Regex("^[A-Za-zÀ-ÿ\\s]+\$"))) {
+                Toast.makeText(this, "O nome não deve conter números ou símbolos", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            if (telefone.length != 11) {
+                Toast.makeText(this, "Telefone deve conter 11 dígitos", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
             if (!checkBox.isChecked) {
                 Toast.makeText(this, "Você precisa aceitar os termos", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
-            auth.createUserWithEmailAndPassword(email, senha)
-                .addOnCompleteListener { task ->
-                    if (task.isSuccessful) {
-                        val userId = auth.currentUser?.uid ?: ""
-                        val alunoData = hashMapOf(
-                            "uid" to userId,
-                            "nome" to nome,
-                            "email" to email,
-                            "telefone" to telefone,
-                            "tipo" to "aluno"
-                        )
+            db.collection("usuarios")
+                .whereEqualTo("telefone", telefone)
+                .get()
+                .addOnSuccessListener { documents ->
+                    if (!documents.isEmpty) {
+                        Toast.makeText(this, "Telefone já cadastrado", Toast.LENGTH_SHORT).show()
+                        return@addOnSuccessListener
+                    }
 
-                        db.collection("usuarios").document(userId)
-                            .set(alunoData)
-                            .addOnSuccessListener {
-                                Toast.makeText(this, "Conta criada com sucesso!", Toast.LENGTH_SHORT).show()
+                    // Só cria o usuário se o telefone ainda não estiver cadastrado
+                    auth.createUserWithEmailAndPassword(email, senha)
+                        .addOnCompleteListener { task ->
+                            if (task.isSuccessful) {
+                                val userId = auth.currentUser?.uid ?: ""
+                                val alunoData = hashMapOf(
+                                    "uid" to userId,
+                                    "nome" to nome,
+                                    "email" to email,
+                                    "telefone" to telefone,
+                                    "tipo" to "aluno"
+                                )
 
-                                val sharedPrefs = getSharedPreferences("app_prefs", MODE_PRIVATE)
-                                sharedPrefs.edit().putBoolean("isLoggedIn", true).apply()
-                                val userType = "aluno"
-                                // Salva o tipo de usuário no SharedPreferences
-                                sharedPrefs.edit().putString("userType", userType).apply()
+                                db.collection("usuarios").document(userId)
+                                    .set(alunoData)
+                                    .addOnSuccessListener {
+                                        Toast.makeText(this, "Conta criada com sucesso!", Toast.LENGTH_SHORT).show()
 
-                                fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+                                        val sharedPrefs = getSharedPreferences("app_prefs", MODE_PRIVATE)
+                                        sharedPrefs.edit().putBoolean("isLoggedIn", true).apply()
+                                        sharedPrefs.edit().putString("userType", "aluno").apply()
 
-                                // Verificar permissão de localização
-                                if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                                    ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), REQUEST_CODE_LOCATION)
-                                } else {
-                                    obterLocalizacao() // Caso já tenha permissão, obter a localização imediatamente
+                                        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+
+                                        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                                            != PackageManager.PERMISSION_GRANTED
+                                        ) {
+                                            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), REQUEST_CODE_LOCATION)
+                                        } else {
+                                            obterLocalizacao()
+                                        }
+
+                                        startActivity(Intent(this, LoginActivity::class.java))
+                                        finish()
+                                    }
+                                    .addOnFailureListener {
+                                        Toast.makeText(this, "Erro ao salvar dados: ${it.message}", Toast.LENGTH_SHORT).show()
+                                    }
+                            }
+                            else {
+                                val exception = task.exception
+                                val errorMessage = when (exception) {
+                                    is FirebaseAuthException -> when (exception.errorCode) {
+                                        "ERROR_INVALID_EMAIL" -> "Por favor, insira um e-mail válido."
+                                        "ERROR_EMAIL_ALREADY_IN_USE" -> "Este e-mail já está em uso."
+                                        "ERROR_WEAK_PASSWORD" -> "A senha deve ter pelo menos 6 caracteres."
+                                        else -> "Erro: ${exception.message}"
+                                    }
+                                    else -> "Erro desconhecido: ${exception?.message}"
                                 }
 
-                                startActivity(Intent(this, LoginActivity::class.java))
-                                finish()
+                                Toast.makeText(this, errorMessage, Toast.LENGTH_SHORT).show()
                             }
-                            .addOnFailureListener {
-                                Toast.makeText(this, "Erro ao salvar dados: ${it.message}", Toast.LENGTH_SHORT).show()
-                            }
-                    } else {
-                        Toast.makeText(this, "Erro ao criar usuário: ${task.exception?.message}", Toast.LENGTH_SHORT).show()
-                    }
+                        }
+
                 }
-            }
+                .addOnFailureListener {
+                    Toast.makeText(this, "Erro ao verificar telefone: ${it.message}", Toast.LENGTH_SHORT).show()
+                }
         }
+    }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
