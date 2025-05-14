@@ -107,7 +107,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:fontFamily="@font/concert_one"
-            android:text="@string/termos"
+            android:text="termos e condições"
             android:textColor="#8900DD"
             app:layout_constraintBaseline_toBaselineOf="@id/checkBox"
             app:layout_constraintEnd_toEndOf="parent"

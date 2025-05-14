@@ -42,6 +42,8 @@
 
         <activity android:name=".InformacoesActivity" />
 
+        <activity android:name=".RedefinirSenhaActivity" />
+
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="com.example.ryno.provider"

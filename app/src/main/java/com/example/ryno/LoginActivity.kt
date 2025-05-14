@@ -16,6 +16,7 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -74,17 +75,6 @@ class LoginActivity : AppCompatActivity() {
         val passwordEditText = findViewById<EditText>(R.id.editTextPassword)
         val buttonLogin = findViewById<Button>(R.id.buttonLogin)
 
-        buttonLogin.setOnClickListener {
-            val email = emailEditText.text.toString()
-            val password = passwordEditText.text.toString()
-
-            if (email.isNotEmpty() && password.isNotEmpty()) {
-                loginUser(email, password)
-            } else {
-                Toast.makeText(this, "Por favor, preencha todos os campos", Toast.LENGTH_SHORT).show()
-            }
-        }
-
         val tvCriarConta = findViewById<TextView>(R.id.tvCriarConta)
 
         val texto = "Não tem uma conta? Criar Conta"
@@ -109,6 +99,25 @@ class LoginActivity : AppCompatActivity() {
 
         tvCriarConta.text = spannableString
         tvCriarConta.movementMethod = LinkMovementMethod.getInstance()
+
+        buttonLogin.setOnClickListener {
+            val email = emailEditText.text.toString()
+            val password = passwordEditText.text.toString()
+
+            if (email.isNotEmpty() && password.isNotEmpty()) {
+                loginUser(email, password)
+            } else {
+                Toast.makeText(this, "Por favor, preencha todos os campos", Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        val RedefinirSenhaTextView: TextView = findViewById(R.id.RedefinirSenha)
+
+        RedefinirSenhaTextView.setOnClickListener {
+            val intent = Intent(this, RedefinirSenhaActivity::class.java)
+            startActivity(intent)
+                finish()
+        }
     }
 
     private fun loginUser(email: String, password: String) {
