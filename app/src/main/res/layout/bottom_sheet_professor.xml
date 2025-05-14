@@ -61,6 +61,7 @@
         android:fontFamily="@font/concert_one"
         android:layout_marginTop="20dp"
         android:textColor="#8900DD"
+        android:textColorLink="#8900DD"
         android:textSize="30sp"
         android:textStyle="normal"/>
 

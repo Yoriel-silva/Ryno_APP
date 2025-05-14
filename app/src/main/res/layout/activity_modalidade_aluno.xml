@@ -54,12 +54,14 @@
 
     <SeekBar
         android:id="@+id/seekBarDistancia"
-        android:layout_width="0dp"
+        android:layout_width="250dp"
         android:layout_height="wrap_content"
         android:layout_margin="20dp"
-        android:max="1000"
+        android:max="30"
         android:progress="1"
         android:layout_marginBottom="8dp"
+        android:progressTint="#ffff"
+        android:thumbTint="#ffff"
         app:layout_constraintTop_toBottomOf="@id/txtFiltrarDistancia"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />

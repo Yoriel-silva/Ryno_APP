@@ -3,6 +3,8 @@ package com.example.ryno
 import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.location.Location
 import android.os.Bundle
 import android.util.Log
@@ -47,6 +49,8 @@ class CadastroAlunoActivity : AppCompatActivity() {
             val dialog = AlertDialog.Builder(this)
                 .setView(dialogView)
                 .create()
+
+            dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
 
             // Configurando o botão de fechar
             val closeButton: Button = dialogView.findViewById(R.id.btn_close)
