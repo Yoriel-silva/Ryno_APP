@@ -121,20 +121,20 @@
         app:layout_constraintTop_toBottomOf="@+id/edtEmail" />
 
     <Button
-        android:id="@+id/btnSalvar"
+        android:id="@+id/btnDeslogar"
         android:layout_width="130dp"
         android:layout_height="48dp"
         android:layout_marginTop="24dp"
-        android:layout_marginEnd="32dp"
         android:background="@drawable/rounded_button"
         android:fontFamily="@font/concert_one"
         android:padding="12dp"
-        android:text="Salvar"
-        android:visibility="invisible"
+        android:text="Deslogar"
         android:textAlignment="center"
         android:textColor="@color/white"
         android:textSize="16sp"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/btnSalvar"
+        app:layout_constraintHorizontal_bias="0.492"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/edtTelefone" />
 
     <Button
@@ -155,27 +155,27 @@
         app:layout_constraintTop_toBottomOf="@+id/edtTelefone" />
 
     <Button
-        android:id="@+id/btnDeslogar"
+        android:id="@+id/btnSalvar"
         android:layout_width="130dp"
         android:layout_height="48dp"
         android:layout_marginTop="24dp"
+        android:layout_marginEnd="32dp"
         android:background="@drawable/rounded_button"
         android:fontFamily="@font/concert_one"
         android:padding="12dp"
-        android:text="Deslogar"
+        android:text="Salvar"
+        android:visibility="invisible"
         android:textAlignment="center"
         android:textColor="@color/white"
         android:textSize="16sp"
-        app:layout_constraintEnd_toStartOf="@+id/btnSalvar"
-        app:layout_constraintHorizontal_bias="0.492"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/edtTelefone" />
 
     <Button
         android:id="@+id/btnVoltar"
         android:layout_width="130dp"
         android:layout_height="48dp"
-        android:layout_marginTop="128dp"
+        android:layout_marginTop="72dp"
         android:background="@drawable/rounded_button"
         android:fontFamily="@font/concert_one"
         android:padding="12dp"
@@ -184,7 +184,7 @@
         android:textColor="@color/white"
         android:textSize="16sp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.501"
+        app:layout_constraintHorizontal_bias="0.497"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/btnDeslogar" />
 

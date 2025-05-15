@@ -7,6 +7,19 @@
     android:background="#000000"
     android:padding="24dp">
 
+    <TextView
+        android:id="@+id/textHistorico"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:fontFamily="@font/concert_one"
+        android:text="Histórico"
+        android:textColor="#8900DD"
+        android:textSize="30sp"
+        android:textStyle="normal"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"/>
+
     <LinearLayout
         android:layout_width="350dp"
         android:layout_height="500dp"
@@ -14,7 +27,7 @@
         android:padding="16dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toBottomOf="@+id/textHistorico">
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerProfessoresRecentes"

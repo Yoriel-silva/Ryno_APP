@@ -97,7 +97,7 @@ class LoginActivity : AppCompatActivity() {
             override fun updateDrawState(ds: android.text.TextPaint) {
                 super.updateDrawState(ds)
                 ds.isUnderlineText = true
-                ds.color = Color.parseColor("#6200EE")
+                ds.color = Color.parseColor("#8900DD")
             }
         }
 
@@ -124,7 +124,6 @@ class LoginActivity : AppCompatActivity() {
         RedefinirSenhaTextView.setOnClickListener {
             val intent = Intent(this, RedefinirSenhaActivity::class.java)
             startActivity(intent)
-                finish()
         }
 
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)

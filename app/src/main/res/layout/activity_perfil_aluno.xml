@@ -47,7 +47,7 @@
         android:background="@drawable/rounded_button"
         android:fontFamily="@font/concert_one"
         android:padding="12dp"
-        android:text="Histrico"
+        android:text="Histórico"
         android:textAlignment="center"
         android:textColor="@color/white"
         android:textSize="16sp"

@@ -14,7 +14,7 @@
         android:fontFamily="@font/concert_one"
         android:text="Coloque o e-mail para redefinição"
         android:textColor="#8900DD"
-        android:textSize="22sp"
+        android:textSize="20sp"
         android:textStyle="normal"
         android:layout_gravity="center_horizontal"/>
 

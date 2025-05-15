@@ -8,9 +8,6 @@
     android:padding="24dp">
 
     <!-- Campos para editar informações -->
-
-    <!-- Botões -->
-
     <TextView
         android:id="@+id/textPerfil"
         android:layout_width="wrap_content"
@@ -34,8 +31,8 @@
         android:layout_marginTop="32dp"
         android:background="@drawable/circular_white_background"
         android:contentDescription="Imagem de perfil"
-        android:src="@drawable/ic_default_avatar"
         android:scaleType="fitCenter"
+        android:src="@drawable/ic_default_avatar"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.49"
         app:layout_constraintStart_toStartOf="parent"
@@ -76,11 +73,11 @@
         android:layout_height="45dp"
         android:layout_marginTop="40dp"
         android:background="@drawable/edittext_background"
+        android:enabled="false"
         android:fontFamily="@font/concert_one"
+        android:hint="Nome"
         android:inputType="textPersonName"
         android:padding="12dp"
-        android:enabled="false"
-        android:hint="Nome"
         android:textColor="#8900DD"
         android:textColorHint="#8900DD"
         app:layout_constraintEnd_toEndOf="parent"
@@ -94,10 +91,10 @@
         android:layout_height="45dp"
         android:layout_marginTop="12dp"
         android:background="@drawable/edittext_background"
+        android:enabled="false"
         android:fontFamily="@font/concert_one"
         android:inputType="textEmailAddress"
         android:padding="12dp"
-        android:enabled="false"
         android:text="email@dominio.com"
         android:textColor="#8900DD"
         android:textColorHint="#8900DD"
@@ -112,11 +109,11 @@
         android:layout_height="45dp"
         android:layout_marginTop="12dp"
         android:background="@drawable/edittext_background"
+        android:enabled="false"
         android:fontFamily="@font/concert_one"
         android:inputType="text"
         android:maxLength="11"
         android:padding="12dp"
-        android:enabled="false"
         android:text="11111-1111"
         android:textColor="#8900DD"
         android:textColorHint="#8900DD"
@@ -130,11 +127,11 @@
         android:layout_height="45dp"
         android:layout_marginTop="12dp"
         android:background="@drawable/edittext_background"
+        android:enabled="false"
         android:fontFamily="@font/concert_one"
         android:inputType="text"
         android:maxLength="11"
         android:padding="12dp"
-        android:enabled="false"
         android:text="1111111"
         android:textColor="#8900DD"
         android:textColorHint="#8900DD"
@@ -149,9 +146,9 @@
         android:layout_marginTop="12dp"
         android:background="@drawable/edittext_background"
         android:clickable="true"
+        android:enabled="false"
         android:focusable="false"
         android:fontFamily="@font/concert_one"
-        android:enabled="false"
         android:hint="Escolha uma ou mais modalidades"
         android:padding="12dp"
         android:textColor="#8900DD"
@@ -169,8 +166,8 @@
         android:layout_marginTop="12dp"
         android:background="@drawable/edittext_background"
         android:completionThreshold="1"
-        android:fontFamily="@font/concert_one"
         android:enabled="false"
+        android:fontFamily="@font/concert_one"
         android:hint="Digite a cidade"
         android:inputType="text"
         android:padding="12dp"
@@ -181,56 +178,67 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/edtModalidade" />
 
-    <Button
-        android:id="@+id/btnSalvar"
-        android:layout_width="130dp"
-        android:layout_height="48dp"
-        android:layout_marginTop="24dp"
-        android:layout_marginEnd="32dp"
-        android:background="@drawable/rounded_button"
-        android:fontFamily="@font/concert_one"
-        android:padding="12dp"
-        android:text="Salvar"
-        android:visibility="invisible"
-        android:textAlignment="center"
-        android:textColor="@color/white"
-        android:textSize="16sp"
+    <!-- Botões -->
+    <FrameLayout
+        android:layout_width="280dp"
+        android:layout_height="wrap_content"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/edtCidade" />
-
-    <Button
-        android:id="@+id/btnEditar"
-        android:layout_width="130dp"
-        android:layout_height="48dp"
-        android:layout_marginTop="24dp"
-        android:layout_marginEnd="32dp"
-        android:background="@drawable/rounded_button"
-        android:fontFamily="@font/concert_one"
-        android:padding="12dp"
-        android:text="Editar"
-        android:visibility="visible"
-        android:textAlignment="center"
-        android:textColor="@color/white"
-        android:textSize="16sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/edtCidade" />
-
-    <Button
-        android:id="@+id/btnDeslogar"
-        android:layout_width="130dp"
-        android:layout_height="48dp"
-        android:layout_marginTop="24dp"
-        android:background="@drawable/rounded_button"
-        android:fontFamily="@font/concert_one"
-        android:padding="12dp"
-        android:text="Deslogar"
-        android:textAlignment="center"
-        android:textColor="@color/white"
-        android:textSize="16sp"
-        app:layout_constraintEnd_toStartOf="@+id/btnSalvar"
-        app:layout_constraintHorizontal_bias="0.492"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/edtCidade" />
+        app:layout_constraintTop_toBottomOf="@+id/edtCidade"
+        android:layout_marginTop="12dp">
 
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@+id/edtCidade"
+            tools:layout_editor_absoluteX="24dp">
+
+            <Button
+                android:id="@+id/btnDeslogar"
+                android:layout_width="130dp"
+                android:layout_height="48dp"
+                android:background="@drawable/rounded_button"
+                android:fontFamily="@font/concert_one"
+                android:padding="12dp"
+                android:text="Deslogar"
+                android:textAlignment="center"
+                android:layout_marginRight="20dp"
+                android:textColor="@color/white"
+                android:textSize="16sp"
+                tools:layout_editor_absoluteX="56dp"
+                tools:layout_editor_absoluteY="599dp" />
+
+            <Button
+                android:id="@+id/btnEditar"
+                android:layout_width="130dp"
+                android:layout_height="48dp"
+                android:background="@drawable/rounded_button"
+                android:fontFamily="@font/concert_one"
+                android:padding="12dp"
+                android:text="Editar"
+                android:textAlignment="center"
+                android:textColor="@color/white"
+                android:textSize="16sp"
+                android:visibility="visible"
+                tools:layout_editor_absoluteX="235dp"
+                tools:layout_editor_absoluteY="599dp" />
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/btnSalvar"
+            android:layout_width="130dp"
+            android:layout_height="48dp"
+            android:layout_gravity="right"
+            android:background="@drawable/rounded_button"
+            android:fontFamily="@font/concert_one"
+            android:padding="12dp"
+            android:text="Salvar"
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            android:visibility="invisible"
+            tools:layout_editor_absoluteX="235dp"
+            tools:layout_editor_absoluteY="599dp" />
+
+    </FrameLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -113,6 +113,7 @@
         android:id="@+id/RedefinirSenha"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="7dp"
         android:fontFamily="@font/concert_one"
         android:text="Esqueceu sua senha?"
         android:textColor="#8900DD"

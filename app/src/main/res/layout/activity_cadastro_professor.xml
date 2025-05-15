@@ -1,14 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fillViewport="true">
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:paddingBottom="30dp"
         android:background="#000000">
 
         <!-- LOGO -->
@@ -130,7 +131,7 @@
             android:textColor="#8900DD"
             android:textColorHint="#8900DD"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.48"
+            app:layout_constraintHorizontal_bias="0.504"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/modalidadeSelecionada" />
 
@@ -138,12 +139,13 @@
             android:id="@+id/SenhaProfessorBox"
             android:layout_width="280dp"
             android:layout_height="55dp"
-            android:layout_marginTop="16dp"
-            app:passwordToggleEnabled="true"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
+            android:layout_marginTop="1dp"
             android:textColorHint="#8900DD"
-            app:layout_constraintTop_toBottomOf="@id/autoCidade">
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.504"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/autoCidade"
+            app:passwordToggleEnabled="true">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/SenhaProfessor"
@@ -202,6 +204,7 @@
             android:layout_width="130dp"
             android:layout_height="41dp"
             android:layout_marginTop="36dp"
+            android:layout_marginBottom="36dp"
             android:background="@drawable/rounded_button"
             android:fontFamily="@font/concert_one"
             android:text="Criar"
