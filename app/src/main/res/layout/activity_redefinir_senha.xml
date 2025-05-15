@@ -3,21 +3,49 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="16dp">
+    android:padding="16dp"
+    android:background="@color/black">
+
+    <TextView
+        android:id="@+id/textLogin"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="80dp"
+        android:fontFamily="@font/concert_one"
+        android:text="Coloque o e-mail para redefinição"
+        android:textColor="#8900DD"
+        android:textSize="22sp"
+        android:textStyle="normal"
+        android:layout_gravity="center_horizontal"/>
 
     <!-- Campo para digitar o e-mail -->
     <EditText
         android:id="@+id/emailEditText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Digite seu e-mail"
+        android:layout_marginTop="24dp"
+        android:background="@drawable/edittext_background"
+        android:fontFamily="@font/concert_one"
+        android:hint="E-mail"
         android:inputType="textEmailAddress"
-        android:padding="10dp" />
+        android:padding="12dp"
+        android:textColor="#8900DD"
+        android:textColorHint="#8900DD"
+        android:layout_gravity="center_horizontal"/>
 
     <!-- Botão para enviar o link de redefinição -->
+
     <Button
         android:id="@+id/resetPasswordButton"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Enviar link de redefinição" />
+        android:layout_width="wrap_content"
+        android:layout_height="48dp"
+        android:layout_marginTop="28dp"
+        android:background="@drawable/rounded_button"
+        android:fontFamily="@font/concert_one"
+        android:padding="12dp"
+        android:text="Enviar link de redefinição"
+        android:textAlignment="center"
+        android:textColor="@color/white"
+        android:textSize="16sp"
+        android:layout_gravity="center_horizontal"/>
 </LinearLayout>
